@@ -36,12 +36,12 @@ const FETCH_EXAMPLE = `-- any HTTP client works; no auth, CORS is open. JS examp
 -- const weapons  = await (await fetch('${SITE}data/weapons.json')).json()`
 
 const MCP_EXAMPLE = `# MCP server (Claude Code / any MCP client) — search all datasets,
-# reverse hash lookup, entry details, joaat calculator. No clone needed:
-claude mcp add rdr2-explorer -- npx -y github:QUITFIL3/rdr2-explorer
+# reverse hash lookup, entry details, joaat calculator.
+# One file, no dependencies — download once, then register it:
+curl -O ${SITE}mcp-server.mjs
+claude mcp add rdr2-explorer -- node mcp-server.mjs
 
-# or grab the single file (no npm, data is fetched from this site):
-#   curl -O ${SITE}mcp-server.mjs
-#   claude mcp add rdr2-explorer -- node mcp-server.mjs
+# (inside a clone of the repo, Claude Code picks it up via .mcp.json instead)
 # tools: list_categories · search · get_entry · hash_name`
 
 const AI_PROMPT = `You can query the RDR2 EXPLORER knowledge base (Red Dead Redemption 2 /
