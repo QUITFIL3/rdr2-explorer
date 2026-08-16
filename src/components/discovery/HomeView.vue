@@ -131,7 +131,7 @@ const hashResult = computed(() => {
   cursor: pointer;
   transition: border-color var(--dur-fast);
 }
-.hero-search:hover { border-color: var(--accent-primary); }
+.hero-search:hover { border-color: var(--focus-border); text-decoration: none; }
 .hero-search span { flex: 1; text-align: left; }
 
 .hero-stats { display: flex; gap: var(--sp-6); margin: var(--sp-6) 0 var(--sp-1); flex-wrap: wrap; }

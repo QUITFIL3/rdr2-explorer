@@ -39,6 +39,11 @@
   --scrollbar-hover: #39404a;
   --backdrop: rgba(4, 6, 8, 0.78);
 
+  /* Focus is neutral on purpose: the brand accent is a red, and a red box
+     around an input reads as a validation error rather than "you are here". */
+  --focus-border: #6b7683;
+  --focus-ring: rgba(120, 140, 165, 0.28);
+
   /* ---------- typography ---------- */
   --font-ui: 'Kanit', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-logo: 'Kanit', 'Segoe UI', system-ui, sans-serif;
@@ -122,6 +127,9 @@
   --scrollbar: #d2d2ce;
   --scrollbar-hover: #b4b4af;
   --backdrop: rgba(20, 20, 22, 0.42);
+
+  --focus-border: #8a9099;
+  --focus-ring: rgba(90, 110, 135, 0.22);
 
   --shadow-panel: 0 8px 32px rgba(20, 20, 25, 0.14);
   --shadow-pop: 0 4px 16px rgba(20, 20, 25, 0.1);

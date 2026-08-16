@@ -207,7 +207,10 @@ function clearAll() {
   color: var(--text-muted);
   transition: border-color var(--dur-fast);
 }
-.search-box:focus-within { border-color: var(--accent-primary); }
+.search-box:focus-within {
+  border-color: var(--focus-border);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
 .search-box-input {
   flex: 1;
   min-width: 0;
@@ -218,6 +221,8 @@ function clearAll() {
   font: var(--fs-md) var(--font-mono);
 }
 .search-box-input::placeholder { color: var(--text-muted); }
+/* the panel supplies its own clear button */
+.search-box-input::-webkit-search-cancel-button { display: none; }
 .search-box .icon-btn { border: none; width: 24px; height: 24px; }
 
 .search-hint { margin-top: var(--sp-2); font-size: var(--fs-sm); color: var(--text-muted); }

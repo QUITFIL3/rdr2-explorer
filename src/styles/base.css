@@ -17,7 +17,14 @@ a:hover { text-decoration: underline; }
 
 button { font: inherit; color: inherit; }
 
-:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 1px; }
+:focus-visible {
+  outline: 2px solid var(--focus-border);
+  outline-offset: 1px;
+  border-radius: var(--radius-sm);
+}
+/* text fields carry their own focus treatment (border + ring), so the extra
+   outline would double up */
+input:focus-visible, textarea:focus-visible { outline: none; }
 
 .mono { font-family: var(--font-mono); }
 
