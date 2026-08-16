@@ -61,24 +61,52 @@ async function build(manifest) {
   indexReady.value = true
 }
 
-// Ranked search. Returns [{ n, c, g, rank }...] grouped-cap per category.
+// Ranking, best first. Exact beats prefix beats word-boundary beats substring,
+// so searching "cattleman" puts WEAPON_REVOLVER_CATTLEMAN above anything that
+// merely contains the word somewhere.
+const RANK_EXACT = 0
+const RANK_HASH = 1
+const RANK_PREFIX = 2
+const RANK_WORD = 3
+const RANK_SUBSTRING = 4
+const SCAN_CAP = 8000 // stop scanning once we clearly have enough to rank
+
+function rankOf(entry, text, hash) {
+  if (hash && entry.h === hash) return RANK_HASH
+  if (!text) return -1
+  const l = entry.l
+  if (l === text) return RANK_EXACT
+  if (l.startsWith(text)) return RANK_PREFIX
+  const at = l.indexOf(text)
+  if (at < 0) return -1
+  // preceded by a separator counts as a word start ("revolver_CATTLEman")
+  return l[at - 1] === '_' || l[at - 1] === ' ' || l[at - 1] === '/' ? RANK_WORD : RANK_SUBSTRING
+}
+
+/**
+ * Search the whole index.
+ * @param {{text: string, categoryId: string|null, hash: string|null}} query parsed query
+ * @param {{perCategory?: number, limit?: number}} [opts] perCategory caps how many
+ *   hits one category may contribute (use Infinity for a full category listing)
+ * @returns {{n: string, c: string, g: string|null, rank: number}[]}
+ */
 export function searchAll(query, { perCategory = 5, limit = 60 } = {}) {
-  const q = query.toLowerCase().trim()
-  if (q.length < 2) return []
-  const isHash = q.startsWith('0x')
+  const text = (query.text || '').toLowerCase().trim()
+  const hash = query.hash || null
+  if (!hash && text.length < 2) return []
+
   const matches = []
   for (let i = 0; i < entries.length; i++) {
     const e = entries[i]
-    let rank = -1
-    if (e.l === q) rank = 0
-    else if (e.l.startsWith(q)) rank = 1
-    else if (e.l.includes(q)) rank = 2
-    else if (isHash && e.h && e.h.startsWith(q)) rank = 1
+    if (query.categoryId && e.c !== query.categoryId) continue
+    const rank = rankOf(e, text, hash)
     if (rank < 0) continue
     matches.push({ n: e.n, c: e.c, g: e.g, rank })
-    if (matches.length >= 6000) break
+    if (matches.length >= SCAN_CAP) break
   }
   matches.sort((a, b) => a.rank - b.rank || a.n.length - b.n.length)
+
+  if (perCategory === Infinity) return matches.slice(0, limit)
   const perCat = new Map()
   const out = []
   for (const m of matches) {
@@ -89,4 +117,18 @@ export function searchAll(query, { perCategory = 5, limit = 60 } = {}) {
     if (out.length >= limit) break
   }
   return out
+}
+
+/** Total hits per category for the given query, for the results-page facets. */
+export function countByCategory(query) {
+  const text = (query.text || '').toLowerCase().trim()
+  const hash = query.hash || null
+  const counts = new Map()
+  if (!hash && text.length < 2) return counts
+  for (let i = 0; i < entries.length; i++) {
+    const e = entries[i]
+    if (rankOf(e, text, hash) < 0) continue
+    counts.set(e.c, (counts.get(e.c) || 0) + 1)
+  }
+  return counts
 }

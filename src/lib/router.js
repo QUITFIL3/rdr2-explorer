@@ -12,6 +12,7 @@ export function parseHash() {
   if (m) return { page: 'cat', id: m[1], query }
   if (path === '/bookmarks') return { page: 'bookmarks', id: null, query }
   if (path === '/credits') return { page: 'credits', id: null, query }
+  if (path === '/search') return { page: 'search', id: null, query }
   return { page: 'home', id: null, query }
 }
 
@@ -23,6 +24,13 @@ export function replaceQuery(params) {
   const path = qi >= 0 ? h.slice(0, qi) : h
   const qs = params.toString()
   history.replaceState(null, '', '#' + path + (qs ? '?' + qs : ''))
+}
+
+export function searchUrl(text) {
+  const p = new URLSearchParams()
+  if (text) p.set('q', text)
+  const qs = p.toString()
+  return '#/search' + (qs ? '?' + qs : '')
 }
 
 export function entryUrl(catId, entry) {

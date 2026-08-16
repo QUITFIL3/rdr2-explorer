@@ -4,7 +4,7 @@ import { CATEGORY_META } from '../../categories.js'
 import { joaat, toHex, toSigned, copyText } from '../../lib/joaat.js'
 import { t, catDesc, catTitle } from '../../i18n.js'
 import { recents } from '../../lib/storage.js'
-import { entryUrl } from '../../lib/router.js'
+import { entryUrl, searchUrl } from '../../lib/router.js'
 import Icon from '../common/Icon.vue'
 
 const props = defineProps({ manifest: { type: Array, required: true } })
@@ -43,11 +43,11 @@ const hashResult = computed(() => {
         </template>
       </p>
 
-      <button class="hero-search" @click="$emit('open-palette')">
+      <a class="hero-search" :href="searchUrl('')">
         <Icon name="search" :size="15" />
         <span>{{ t('searchBig', { n: fmt(total) }) }}</span>
         <kbd>Ctrl K</kbd>
-      </button>
+      </a>
 
       <div class="hero-stats">
         <div class="stat"><strong>{{ fmt(total) }}</strong><span>{{ t('statEntries') }}</span></div>

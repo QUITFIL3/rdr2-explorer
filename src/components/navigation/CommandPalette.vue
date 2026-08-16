@@ -4,8 +4,9 @@ import { t, catTitle, toggleLocale } from '../../i18n.js'
 import { toggleTheme } from '../../theme.js'
 import { CATEGORY_META } from '../../categories.js'
 import { ensureIndex, searchAll, indexReady, indexProgress } from '../../lib/searchIndex.js'
-import { recents } from '../../lib/storage.js'
-import { entryUrl } from '../../lib/router.js'
+import { recents, devMode } from '../../lib/storage.js'
+import { entryUrl, searchUrl } from '../../lib/router.js'
+import { parseQuery } from '../../lib/searchQuery.js'
 import Icon from '../common/Icon.vue'
 
 const props = defineProps({
@@ -54,6 +55,7 @@ const commands = computed(() => [
   { type: 'cmd', icon: 'star', label: t('cmdBookmarks'), run: () => (location.hash = '#/bookmarks') },
   { type: 'cmd', icon: 'moon', label: t('cmdToggleTheme'), run: toggleTheme },
   { type: 'cmd', icon: 'globe', label: t('cmdToggleLang'), run: toggleLocale },
+  { type: 'cmd', icon: 'sliders', label: t('devMode'), run: () => (devMode.value = !devMode.value) },
 ])
 
 const items = computed(() => {
@@ -64,7 +66,9 @@ const items = computed(() => {
     : commands.value
   out.push(...cmds)
   if (query.length >= 2) {
-    for (const m of searchAll(query)) out.push({ type: 'entry', ...m })
+    const parsed = parseQuery(dq.value.trim(), props.manifest.map((c) => c.id))
+    for (const m of searchAll(parsed)) out.push({ type: 'entry', ...m })
+    out.push({ type: 'all', label: t('seeAllResults'), href: searchUrl(dq.value.trim()) })
   } else if (!query) {
     for (const r of recents.value.slice(0, 8)) {
       out.push({ type: 'entry', n: r.name, c: r.cat, g: r.group || null, recent: true })
@@ -76,6 +80,7 @@ const items = computed(() => {
 function execute(item) {
   if (!item) return
   if (item.type === 'cmd') item.run()
+  else if (item.type === 'all') location.hash = item.href
   else location.hash = entryUrl(item.c, { name: item.n, group: item.g })
   emit('close')
 }
@@ -119,7 +124,7 @@ function onKey(e) {
         <div ref="listEl" class="pal-list" role="listbox" :aria-label="t('globalSearch')">
           <div
             v-for="(item, i) in items"
-            :key="item.type === 'cmd' ? 'cmd' + item.label : item.c + (item.g || '') + item.n + i"
+            :key="item.type === 'entry' ? item.c + (item.g || '') + item.n + i : item.type + item.label"
             class="pal-item"
             role="option"
             :aria-selected="i === activeIdx"
@@ -127,7 +132,12 @@ function onKey(e) {
             @pointermove="activeIdx = i"
             @click="execute(item)"
           >
-            <template v-if="item.type === 'cmd'">
+            <template v-if="item.type === 'all'">
+              <Icon name="search" :size="13" class="pal-ico" />
+              <span class="pal-name">{{ item.label }}</span>
+              <span class="pal-tag"><kbd>Enter</kbd></span>
+            </template>
+            <template v-else-if="item.type === 'cmd'">
               <Icon :name="item.icon" :size="13" class="pal-ico" />
               <span class="pal-name">{{ item.label }}</span>
               <span class="pal-tag">{{ t('commands') }}</span>

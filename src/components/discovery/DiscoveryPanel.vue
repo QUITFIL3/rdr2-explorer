@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { CATEGORY_META, REPO_URL } from '../../categories.js'
 import { joaat, toHex, toSigned, copyText } from '../../lib/joaat.js'
 import { ensurePreviews, preview } from '../../lib/previews.js'
-import { isBookmarked, toggleBookmark, pushRecent } from '../../lib/storage.js'
+import { isBookmarked, toggleBookmark, pushRecent, devMode } from '../../lib/storage.js'
 import { entryUrl } from '../../lib/router.js'
 import { t } from '../../i18n.js'
 import Icon from '../common/Icon.vue'
@@ -65,6 +65,12 @@ const coords = computed(() => {
 
 const related = computed(() =>
   props.siblings.filter((s) => s !== name.value).slice(0, 6)
+)
+
+// only built when developer mode is on, so a large entry isn't stringified for
+// everyone on every selection
+const rawJson = computed(() =>
+  devMode.value ? JSON.stringify(props.entry, null, 2) : ''
 )
 
 const srcPath = computed(() => props.cat.src || '')
@@ -153,6 +159,18 @@ function share() {
       </div>
     </div>
 
+    <div v-if="devMode" class="panel-section">
+      <div class="panel-label">
+        {{ t('rawRecord') }}
+        <button class="chip small accent" @click="copyText(rawJson)">{{ t('copyJson') }}</button>
+      </div>
+      <div class="dev-meta mono">
+        <div>{{ t('datasetId') }}: {{ cat.id }}</div>
+        <div v-if="srcPath">{{ t('sourceFile') }}: {{ srcPath }}</div>
+      </div>
+      <CodeBlock :code="rawJson" lang="json" />
+    </div>
+
     <div class="panel-section">
       <a class="src-link" :href="srcUrl" target="_blank" rel="noopener">{{ t('viewSource') }}</a>
     </div>
@@ -226,6 +244,12 @@ function share() {
 .hash-results { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .related-list { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
 .src-link { font-size: var(--fs-sm); }
+.dev-meta {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  margin-bottom: var(--sp-2);
+  overflow-wrap: anywhere;
+}
 
 @media (max-width: 1100px) {
   .discovery-panel {

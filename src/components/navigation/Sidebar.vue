@@ -36,6 +36,10 @@ function toggleGroup(name) {
         <span class="nav-icon"><Icon name="home" :size="14" /></span>
         <span class="nav-label">{{ t('overview') }}</span>
       </a>
+      <a href="#/search" class="nav-item" :class="{ active: route.page === 'search' }">
+        <span class="nav-icon"><Icon name="search" :size="14" /></span>
+        <span class="nav-label">{{ t('searchNav') }}</span>
+      </a>
       <a href="#/bookmarks" class="nav-item" :class="{ active: route.page === 'bookmarks' }">
         <span class="nav-icon"><Icon name="star" :size="14" /></span>
         <span class="nav-label">{{ t('bookmarks') }}</span>

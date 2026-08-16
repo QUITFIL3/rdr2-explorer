@@ -7,6 +7,7 @@ import HomeView from './components/discovery/HomeView.vue'
 import CategoryView from './components/discovery/CategoryView.vue'
 import BookmarksView from './components/discovery/BookmarksView.vue'
 import CreditsView from './components/discovery/CreditsView.vue'
+import SearchResultsView from './components/search/SearchResultsView.vue'
 import { parseHash } from './lib/router.js'
 import { t } from './i18n.js'
 import { ensureIndex } from './lib/searchIndex.js'
@@ -75,6 +76,11 @@ const reload = () => location.reload()
         />
         <BookmarksView v-else-if="route.page === 'bookmarks'" :manifest="manifest" />
         <CreditsView v-else-if="route.page === 'credits'" :manifest="manifest" />
+        <SearchResultsView
+          v-else-if="route.page === 'search'"
+          :manifest="manifest"
+          :route-tick="routeTick"
+        />
         <HomeView v-else :manifest="manifest" @open-palette="openPalette" />
       </main>
     </div>

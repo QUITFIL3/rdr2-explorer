@@ -2,6 +2,7 @@
 import { locale, toggleLocale, t } from '../../i18n.js'
 import { effectiveTheme, toggleTheme } from '../../theme.js'
 import { REPO_URL } from '../../categories.js'
+import { devMode } from '../../lib/storage.js'
 import Icon from '../common/Icon.vue'
 
 defineEmits(['open-palette'])
@@ -23,6 +24,12 @@ const markUrl = import.meta.env.BASE_URL + 'brand/hexa-mark.png'
     </button>
 
     <div class="topbar-actions">
+      <button
+        v-if="devMode"
+        class="chip small on dev-flag"
+        :title="t('devModeOn')"
+        @click="devMode = false"
+      >DEV</button>
       <a class="icon-btn" :href="REPO_URL" target="_blank" rel="noopener" title="GitHub">
         <Icon name="github" :size="14" />
       </a>
@@ -116,6 +123,7 @@ kbd {
   margin-left: auto;
   flex-shrink: 0;
 }
+.dev-flag { font-family: var(--font-mono); letter-spacing: 0.05em; }
 .icon-btn.lang { width: auto; padding: 0 var(--sp-2); font-size: var(--fs-sm); font-weight: 600; }
 
 @media (max-width: 720px) {
