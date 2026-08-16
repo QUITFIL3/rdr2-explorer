@@ -11,7 +11,7 @@
     "remove-backgrounds": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/remove-image-backgrounds.ps1",
     "download-model-images": "node scripts/download-model-images.mjs",
     "make-thumbnails": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/make-thumbnails.ps1",
-    "deploy": "node scripts/deploy-pages.mjs",
+    "deploy": "gh workflow run deploy.yml",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"

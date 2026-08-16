@@ -35,6 +35,10 @@ jobs:
           # instead of the 165-400KB originals
           VITE_MODEL_THUMB_PROXY: https://wsrv.nl/?url=
         run: npx vite build
+      - name: Prerender category pages + sitemap
+        run: node -e "import('./scripts/prerender.mjs').then((m) => m.prerender('dist'))"
+      - name: Publish single-file MCP server
+        run: cp scripts/mcp-server.mjs dist/mcp-server.mjs
       - run: touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
