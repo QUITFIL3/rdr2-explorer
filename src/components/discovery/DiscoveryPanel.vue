@@ -146,7 +146,7 @@ function share() {
             class="detail-val"
             :title="t('copy') + ' ' + k"
             @click="copyText(String(v))"
-          ><KeyCaps :keys="String(v)" /></button>
+          ><KeyCaps :keys="String(v)" :variant="k" /></button>
           <button v-else class="detail-val mono" :title="t('copy') + ' ' + k" @click="copyText(String(v))">{{ v }}</button>
         </template>
         <template v-if="coordText">

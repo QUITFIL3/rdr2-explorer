@@ -530,7 +530,7 @@ function cycleSort() {
                   class="chip small keycap-chip"
                   :title="t('copy') + ' ' + f"
                   @click.stop="copyText(String(row[j]))"
-                ><KeyCaps :keys="String(row[j])" /></button>
+                ><KeyCaps :keys="String(row[j])" :variant="f" /></button>
                 <button
                   v-else-if="j > 0 && row[j] !== '' && row[j] !== undefined && f !== 'url'"
                   class="chip small"
