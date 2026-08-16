@@ -56,4 +56,8 @@ const grouped = computed(() => {
 .bm-link:hover { color: var(--accent-primary); text-decoration: none; }
 .bm-dict { color: var(--text-muted); }
 .bookmarks-page .icon-btn { width: 26px; height: 26px; border: none; }
+
+@media (max-width: 720px) {
+  .bookmarks-page { padding: var(--sp-5) var(--sp-3) var(--sp-10); }
+}
 </style>

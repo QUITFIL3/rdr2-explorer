@@ -6,6 +6,18 @@
 
 html, body, #app { height: 100%; }
 
+html {
+  /* keep mobile browsers from inflating text on orientation change */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+button, a {
+  -webkit-tap-highlight-color: transparent;
+  /* removes the double-tap-to-zoom delay on touch without disabling pinch on the page */
+  touch-action: manipulation;
+}
+
 body {
   background: var(--bg-primary);
   color: var(--text-primary);

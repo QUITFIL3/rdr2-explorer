@@ -187,6 +187,7 @@ function share() {
   position: sticky;
   top: var(--topbar-h);
   height: calc(100vh - var(--topbar-h));
+  height: calc(100dvh - var(--topbar-h));
   overflow-y: auto;
 }
 
@@ -259,6 +260,23 @@ function share() {
     width: min(var(--panel-w), 92vw);
     box-shadow: var(--shadow-panel);
     z-index: var(--z-panel);
+  }
+}
+
+/* phones: bottom sheet — the list stays visible and tappable above it */
+@media (max-width: 720px) {
+  .discovery-panel {
+    top: auto;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    max-height: 76vh;
+    max-height: 76dvh;
+    border-left: none;
+    border-top: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding-bottom: calc(var(--sp-5) + env(safe-area-inset-bottom));
   }
 }
 </style>

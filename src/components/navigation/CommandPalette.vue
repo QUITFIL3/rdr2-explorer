@@ -245,4 +245,20 @@ function onKey(e) {
   color: var(--text-muted);
   font-size: var(--fs-xs);
 }
+
+/* keyboard-shortcut hints mean nothing on touch */
+@media (hover: none) {
+  .pal-foot { display: none; }
+}
+
+@media (max-width: 720px) {
+  /* near the top so the on-screen keyboard doesn't cover the result list */
+  .pal-backdrop { padding: var(--sp-3) var(--sp-3) 0; }
+  .palette {
+    max-height: 70vh;
+    max-height: 70dvh;
+  }
+  /* 16px floor stops iOS Safari from auto-zooming the field */
+  .pal-input { font-size: 16px; }
+}
 </style>

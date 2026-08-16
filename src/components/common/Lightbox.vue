@@ -77,8 +77,17 @@ onUnmounted(() => {
 .lb-img {
   max-width: 100%;
   max-height: calc(100vh - 140px);
+  max-height: calc(100dvh - 140px);
   object-fit: contain;
   border-radius: var(--radius-md);
   cursor: default;
+}
+
+@media (max-width: 720px) {
+  .lightbox { padding: var(--sp-3); }
+  .lb-img {
+    max-height: calc(100vh - 100px);
+    max-height: calc(100dvh - 100px);
+  }
 }
 </style>

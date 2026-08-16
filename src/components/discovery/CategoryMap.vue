@@ -40,8 +40,10 @@ const scale = ref(1)
 const tx = ref(0)
 const ty = ref(0)
 
-// dot radius in SVG user units, kept visually constant while zooming
-const dotR = computed(() => 9 / scale.value)
+// dot radius in SVG user units, kept visually constant while zooming;
+// larger base on touch screens so the dots are actually tappable
+const BASE_R = typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches ? 15 : 9
+const dotR = computed(() => BASE_R / scale.value)
 
 function clampPan() {
   const el = wrap.value
@@ -52,17 +54,20 @@ function clampPan() {
   ty.value = Math.min(0, Math.max(h - h * scale.value, ty.value))
 }
 
-function onWheel(e) {
-  const rect = wrap.value.getBoundingClientRect()
-  const mx = e.clientX - rect.left
-  const my = e.clientY - rect.top
+// zoom to s1 keeping the wrap-local point (mx, my) fixed on screen
+function zoomAt(mx, my, s1) {
   const s0 = scale.value
-  const s1 = Math.min(14, Math.max(1, s0 * (e.deltaY < 0 ? 1.35 : 1 / 1.35)))
+  s1 = Math.min(14, Math.max(1, s1))
   if (s1 === s0) return
   tx.value = mx - ((mx - tx.value) * s1) / s0
   ty.value = my - ((my - ty.value) * s1) / s0
   scale.value = s1
   clampPan()
+}
+
+function onWheel(e) {
+  const rect = wrap.value.getBoundingClientRect()
+  zoomAt(e.clientX - rect.left, e.clientY - rect.top, scale.value * (e.deltaY < 0 ? 1.35 : 1 / 1.35))
 }
 
 function resetView() {
@@ -71,35 +76,63 @@ function resetView() {
   ty.value = 0
 }
 
+// active pointers: one = drag-to-pan (or a click/tap), two = pinch-to-zoom
+const pointers = new Map() // pointerId -> { x, y }
 let dragging = false
 let moved = 0
 let lx = 0
 let ly = 0
 let downTarget = null // pointer capture retargets pointerup to the wrap, so remember the real target
-
-let capturedId = null
+let pinchDist = 0
+let pinchMid = null
 
 function onDown(e) {
-  dragging = true
-  moved = 0
-  lx = e.clientX
-  ly = e.clientY
-  downTarget = e.target
-  capturedId = e.pointerId
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
   wrap.value.setPointerCapture(e.pointerId)
+  if (pointers.size === 1) {
+    dragging = true
+    moved = 0
+    lx = e.clientX
+    ly = e.clientY
+    downTarget = e.target
+  } else if (pointers.size === 2) {
+    // a second finger turns the gesture into a pinch — never a click
+    dragging = false
+    downTarget = null
+    const [a, b] = [...pointers.values()]
+    pinchDist = Math.hypot(a.x - b.x, a.y - b.y)
+    pinchMid = null
+    tip.value.show = false
+  }
 }
 
-function releaseCapture() {
-  if (capturedId === null) return
+function releaseCapture(id) {
   try {
-    wrap.value?.releasePointerCapture(capturedId)
+    wrap.value?.releasePointerCapture(id)
   } catch { /* already released by the browser */ }
-  capturedId = null
 }
 
 const tip = ref({ show: false, x: 0, y: 0, text: '' })
 
 function onMove(e) {
+  if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+
+  if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()]
+    const rect = wrap.value.getBoundingClientRect()
+    const dist = Math.hypot(a.x - b.x, a.y - b.y)
+    const mid = { x: (a.x + b.x) / 2 - rect.left, y: (a.y + b.y) / 2 - rect.top }
+    if (pinchMid) {
+      tx.value += mid.x - pinchMid.x
+      ty.value += mid.y - pinchMid.y
+    }
+    if (pinchDist > 0 && dist > 0) zoomAt(mid.x, mid.y, scale.value * (dist / pinchDist))
+    pinchMid = mid
+    pinchDist = dist
+    clampPan()
+    return
+  }
+
   if (dragging) {
     const dx = e.clientX - lx
     const dy = e.clientY - ly
@@ -126,19 +159,37 @@ function onMove(e) {
   }
 }
 
-function onUp() {
-  dragging = false
-  releaseCapture()
-  if (moved < 6 && downTarget) {
-    const i = downTarget.dataset ? downTarget.dataset.i : undefined
-    if (i !== undefined) emit('select', props.points[+i])
+function onUp(e) {
+  pointers.delete(e.pointerId)
+  releaseCapture(e.pointerId)
+  if (pointers.size === 0) {
+    if (dragging && moved < 8 && downTarget) {
+      const i = downTarget.dataset ? downTarget.dataset.i : undefined
+      if (i !== undefined) emit('select', props.points[+i])
+    }
+    dragging = false
+    downTarget = null
+    pinchDist = 0
+    pinchMid = null
+  } else if (pointers.size === 1) {
+    // pinch ended with one finger still down — resume panning from it
+    const [p] = [...pointers.values()]
+    dragging = true
+    moved = 999 // a finger that pinched should not register as a tap
+    lx = p.x
+    ly = p.y
+    pinchDist = 0
+    pinchMid = null
   }
-  downTarget = null
 }
 
-function onLeave() {
-  dragging = false
-  releaseCapture()
+function onLeave(e) {
+  if (pointers.size === 0) {
+    dragging = false
+    tip.value.show = false
+    return
+  }
+  onUp(e)
   tip.value.show = false
 }
 </script>
@@ -152,6 +203,7 @@ function onLeave() {
       @pointerdown="onDown"
       @pointermove="onMove"
       @pointerup="onUp"
+      @pointercancel="onUp"
       @pointerleave="onLeave"
     >
       <div
@@ -202,6 +254,7 @@ function onLeave() {
 .cat-map-wrap {
   position: relative;
   width: min(100%, calc((100vh - 260px) * 2816 / 2304));
+  width: min(100%, calc((100dvh - 260px) * 2816 / 2304));
   aspect-ratio: 2816 / 2304;
   margin: 0 auto;
   border: 1px solid var(--border-primary);

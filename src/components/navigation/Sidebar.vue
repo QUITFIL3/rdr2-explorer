@@ -154,4 +154,22 @@ function toggleGroup(name) {
   color: var(--text-muted);
 }
 .sidebar-footer .credit { margin-top: 2px; font-size: var(--fs-xs); }
+
+@media (max-width: 720px) {
+  /* off-canvas drawer, toggled by the topbar menu button (App.vue owns the state) */
+  .sidebar {
+    position: fixed;
+    top: var(--topbar-h);
+    bottom: 0;
+    left: 0;
+    width: min(300px, 84vw);
+    z-index: calc(var(--z-panel) + 2);
+    transform: translateX(-100%);
+    transition: transform var(--dur-base);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-panel); }
+  /* roomier tap targets inside the drawer */
+  .nav-item { padding-top: var(--sp-2); padding-bottom: var(--sp-2); }
+}
 </style>

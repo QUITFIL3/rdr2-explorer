@@ -171,4 +171,8 @@ const logoUrl = import.meta.env.BASE_URL + 'brand/hexa-logo.png'
   max-width: 70ch;
   line-height: 1.7;
 }
+
+@media (max-width: 720px) {
+  .credits { padding: var(--sp-5) var(--sp-3) var(--sp-10); }
+}
 </style>

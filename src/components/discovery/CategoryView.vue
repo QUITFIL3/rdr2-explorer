@@ -719,6 +719,10 @@ function cycleSort() {
   cursor: zoom-in;
 }
 .tile:hover .zoom-btn { display: flex; }
+/* no hover on touch — keep the zoom button always visible there */
+@media (hover: none) {
+  .zoom-btn { display: flex; width: 28px; height: 28px; }
+}
 .zoom-btn:hover { color: var(--accent-primary); border-color: var(--accent-primary); }
 .row-thumb { cursor: zoom-in; }
 .no-image-ph {
@@ -746,6 +750,13 @@ function cycleSort() {
 }
 
 @media (max-width: 720px) {
-  .cat-main { padding: var(--sp-4); }
+  .cat-main { padding: var(--sp-4) var(--sp-3) var(--sp-10); }
+  /* search takes its own full row; filters and view toggles wrap underneath */
+  .toolbar .search-input { min-width: 100%; }
+  .row.member { padding-left: var(--sp-5); }
+}
+
+@media (max-width: 480px) {
+  .gallery { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
 }
 </style>

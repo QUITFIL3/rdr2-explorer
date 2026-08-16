@@ -263,7 +263,9 @@ function clearAll() {
 }
 
 @media (max-width: 720px) {
-  .search-view { padding: var(--sp-5) var(--sp-4); }
+  .search-view { padding: var(--sp-5) var(--sp-3) var(--sp-10); }
   .search-row-group { display: none; }
+  /* 16px floor stops iOS Safari from auto-zooming the field */
+  .search-box-input { font-size: 16px; }
 }
 </style>

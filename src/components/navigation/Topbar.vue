@@ -5,13 +5,16 @@ import { REPO_URL } from '../../categories.js'
 import { devMode } from '../../lib/storage.js'
 import Icon from '../common/Icon.vue'
 
-defineEmits(['open-palette'])
+defineEmits(['open-palette', 'toggle-menu'])
 
 const markUrl = import.meta.env.BASE_URL + 'brand/hexa-mark.png'
 </script>
 
 <template>
   <header class="topbar">
+    <button class="icon-btn menu-btn" :title="t('menu')" :aria-label="t('menu')" @click="$emit('toggle-menu')">
+      <Icon name="menu" :size="16" />
+    </button>
     <a class="logo" href="#/">
       <img class="logo-mark" :src="markUrl" alt="Hexa Development" width="26" height="26" />
       <span class="logo-text">RDR3 Discoveries</span>
@@ -126,9 +129,20 @@ kbd {
 .dev-flag { font-family: var(--font-mono); letter-spacing: 0.05em; }
 .icon-btn.lang { width: auto; padding: 0 var(--sp-2); font-size: var(--fs-sm); font-weight: 600; }
 
+.menu-btn { display: none; }
+
 @media (max-width: 720px) {
+  .menu-btn { display: flex; }
+  .topbar { gap: var(--sp-2); padding: 0 var(--sp-3); }
   .gs-label { display: none; }
-  .global-search { flex: 0; }
+  .global-search { flex: 0; margin-left: auto; }
+  .global-search kbd { display: none; }
   .logo-text { font-size: var(--fs-md); }
+  .topbar-actions { margin-left: 0; }
+}
+
+/* very narrow phones: the wordmark no longer fits next to the action cluster */
+@media (max-width: 380px) {
+  .logo-text { display: none; }
 }
 </style>

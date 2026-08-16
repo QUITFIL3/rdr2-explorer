@@ -25,11 +25,15 @@ function openPalette() {
   if (manifest.value.length) ensureIndex(manifest.value)
 }
 
+// mobile navigation drawer
+const menuOpen = ref(false)
+
 onMounted(async () => {
   window.addEventListener('hashchange', () => {
     const next = parseHash()
     const samePage = next.page === route.value.page && next.id === route.value.id
     route.value = next
+    menuOpen.value = false
     if (samePage) routeTick.value++
     else document.querySelector('.main')?.scrollTo(0, 0)
   })
@@ -60,9 +64,10 @@ const reload = () => location.reload()
 
 <template>
   <div class="shell">
-    <Topbar @open-palette="openPalette" />
+    <Topbar @open-palette="openPalette" @toggle-menu="menuOpen = !menuOpen" />
     <div class="shell-body">
-      <Sidebar :manifest="manifest" :route="route" />
+      <div v-if="menuOpen" class="sidebar-backdrop" @click="menuOpen = false"></div>
+      <Sidebar :manifest="manifest" :route="route" :class="{ open: menuOpen }" />
       <main class="main">
         <div v-if="loadError" class="state-box">
           <div class="state-title">{{ loadError }}</div>
@@ -89,13 +94,22 @@ const reload = () => location.reload()
 </template>
 
 <style>
-.shell { height: 100vh; display: flex; flex-direction: column; }
+/* dvh tracks the real visible viewport on mobile (URL bar collapse); vh is the fallback */
+.shell { height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
 .shell-body { flex: 1; display: flex; min-height: 0; }
 .main { flex: 1; overflow-y: auto; background: var(--bg-primary); min-width: 0; }
 
+.sidebar-backdrop { display: none; }
+
 @media (max-width: 720px) {
-  .shell-body { flex-direction: column; overflow-y: auto; }
-  .sidebar { width: 100%; max-height: 40vh; }
-  .main { overflow-y: visible; }
+  /* the sidebar becomes an off-canvas drawer (see Sidebar.vue); .main stays the
+     scroll container so scroll-to-top on navigation keeps working */
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: var(--topbar-h) 0 0;
+    background: var(--backdrop);
+    z-index: calc(var(--z-panel) + 1);
+  }
 }
 </style>

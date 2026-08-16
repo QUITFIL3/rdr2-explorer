@@ -186,6 +186,9 @@ const hashResult = computed(() => {
 }
 
 @media (max-width: 720px) {
-  .home { padding: var(--sp-6) var(--sp-4); }
+  .home { padding: var(--sp-6) var(--sp-3) var(--sp-10); }
+  .hero-search kbd { display: none; }
+  .hero-stats { gap: var(--sp-5); }
+  .card-grid { grid-template-columns: 1fr; }
 }
 </style>
