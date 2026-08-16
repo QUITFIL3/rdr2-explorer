@@ -45,6 +45,10 @@ function toggleGroup(name) {
         <span class="nav-label">{{ t('bookmarks') }}</span>
         <span v-if="bookmarks.length" class="nav-count">{{ bookmarks.length }}</span>
       </a>
+      <a href="#/ai" class="nav-item" :class="{ active: route.page === 'ai' }">
+        <span class="nav-icon"><Icon name="zap" :size="14" /></span>
+        <span class="nav-label">{{ t('aiNav') }}</span>
+      </a>
       <a href="#/credits" class="nav-item" :class="{ active: route.page === 'credits' }">
         <span class="nav-icon"><Icon name="award" :size="14" /></span>
         <span class="nav-label">{{ t('credits') }}</span>

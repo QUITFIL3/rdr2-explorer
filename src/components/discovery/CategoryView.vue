@@ -702,7 +702,17 @@ function cycleSort() {
   padding: var(--sp-2);
 }
 .tile-img { position: relative; }
-.tile-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+/* absolute takes the image out of flow, so a very tall source (dividers,
+   scroller strips) can never stretch the square box — and with it the whole
+   grid row */
+.tile-img img {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  max-width: calc(100% - var(--sp-4));
+  max-height: calc(100% - var(--sp-4));
+  object-fit: contain;
+}
 .zoom-btn {
   position: absolute;
   top: var(--sp-1);

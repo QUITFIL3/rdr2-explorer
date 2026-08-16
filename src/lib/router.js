@@ -13,6 +13,7 @@ export function parseHash() {
   if (path === '/bookmarks') return { page: 'bookmarks', id: null, query }
   if (path === '/credits') return { page: 'credits', id: null, query }
   if (path === '/search') return { page: 'search', id: null, query }
+  if (path === '/ai') return { page: 'ai', id: null, query }
   return { page: 'home', id: null, query }
 }
 

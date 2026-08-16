@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { copyText } from '../../lib/joaat.js'
+import { tokenizeLine } from '../../lib/highlight.js'
 import { t } from '../../i18n.js'
 import Icon from './Icon.vue'
 
@@ -9,7 +10,9 @@ const props = defineProps({
   lang: { type: String, default: 'lua' },
 })
 
-const lines = computed(() => props.code.split('\n'))
+const lines = computed(() =>
+  props.code.split('\n').map((line) => tokenizeLine(line, props.lang))
+)
 
 const copied = ref(false)
 let timer
@@ -34,7 +37,7 @@ async function copy() {
       v-for="(line, i) in lines"
       :key="i"
       class="code-line"
-    ><span class="code-ln">{{ i + 1 }}</span>{{ line }}
+    ><span class="code-ln">{{ i + 1 }}</span><span v-for="(tk, j) in line" :key="j" :class="tk.cls || null">{{ tk.s }}</span>
 </span></code></pre>
   </div>
 </template>
@@ -80,4 +83,13 @@ async function copy() {
   user-select: none;
   opacity: 0.55;
 }
+
+/* syntax colors — theme tokens only, so both palettes keep their contrast floor */
+.code .tok-keyword { color: var(--accent-primary); }
+.code .tok-string { color: var(--success); }
+.code .tok-number { color: var(--info); }
+.code .tok-call { color: var(--accent-secondary); }
+.code .tok-key { color: var(--accent-secondary); }
+.code .tok-punct { color: var(--text-secondary); }
+.code .tok-comment { color: var(--text-muted); font-style: italic; }
 </style>

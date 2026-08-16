@@ -13,6 +13,25 @@ const emit = defineEmits(['close'])
 function onKey(e) {
   if (e.key === 'Escape') emit('close')
 }
+
+// fetch -> blob so the download works for cross-origin images too (the
+// download attribute alone is ignored cross-origin); falls back to a new tab
+async function download() {
+  try {
+    const res = await fetch(props.src)
+    if (!res.ok) throw new Error('HTTP ' + res.status)
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    const ext = (props.src.match(/\.(png|jpe?g|webp|gif)(?:$|\?)/i)?.[1] || 'png').toLowerCase()
+    a.href = url
+    a.download = (props.name || 'image') + '.' + ext
+    a.click()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+  } catch {
+    window.open(props.src, '_blank', 'noopener')
+  }
+}
 // return focus where it was so keyboard users don't land at the top of the page
 let opener = null
 onMounted(() => {
@@ -32,6 +51,9 @@ onUnmounted(() => {
         <span class="lb-name mono">{{ name }}</span>
         <button class="icon-btn" :title="t('copyName')" @click="copyText(name)">
           <Icon name="copy" :size="14" />
+        </button>
+        <button class="icon-btn" :title="t('downloadImage')" @click="download">
+          <Icon name="download" :size="14" />
         </button>
         <button class="icon-btn" :title="t('close')" @click="emit('close')">
           <Icon name="x" :size="14" />

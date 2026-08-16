@@ -1,0 +1,60 @@
+# RDR3 Discoveries
+
+> Developer knowledge base for Red Dead Redemption 2 / RedM game data: 411,000+
+> entries — ped/vehicle/object models, weapons, animations, scenarios, audio,
+> particle effects, world data — with joaat hashes and ready-to-paste Lua
+> examples. All data is served as static JSON with permissive CORS; no API key
+> or authentication is needed. Maintained by Hexa Development, built on the
+> community research project femga/rdr3_discoveries.
+
+## Data API (static JSON)
+
+- Manifest — list of every dataset:
+  https://quitfil3.github.io/rdr3-explorer/data/manifest.json
+  Array of { id, title, src, kind: "rows" | "groups", count, fields?, facets?, groupCount?, image?, itemLabel? }
+
+- Dataset payload: https://quitfil3.github.io/rdr3-explorer/data/<id>.json
+  - kind "rows":   { kind: "rows", fields: string[], rows: any[][] }
+    rows[i][j] corresponds to fields[j]; fields[0] is always the entry name.
+    Example (weapons): fields = ["name","hash","group","status"],
+    row = ["weapon_revolver_cattleman","0x169F59F7","revolver","sp and mp"].
+  - kind "groups": { kind: "groups", groups: { [groupName]: string[] } }
+    Used for dictionary-style data, e.g. animation dicts -> animation names,
+    soundsets -> sound names, ptfx dicts -> effect names.
+
+- Model preview image index:
+  https://quitfil3.github.io/rdr3-explorer/data/model_images.json
+  { [modelName]: imageUrl } for peds, vehicles and props.
+
+## Key datasets (by id)
+
+- peds — ped models (name, hash, outfit count)
+- vehicles, objects — vehicle and prop models (objects is ~20k rows)
+- weapons, weapon_components, ammo — weapon data with hashes
+- anims — animation dict -> anims (groups kind; large, ~10 MB)
+- scenarios, emotes — scenario types and kit emotes
+- soundsets, frontend_soundsets, music_events, audio_banks — audio names
+- ptfx — particle effect dict -> effect names
+- doors, interiors, imaps, weather, timecycles, markers, explosion_vfx,
+  animpostfx, text_colors, clothes, pickups — world / misc data
+- tex_* — UI texture dictionaries (rows kind with texture names)
+
+## Conventions
+
+- Hashes are joaat (Jenkins one-at-a-time), identical to GetHashKey() in
+  RedM/FiveM Lua. Hex strings look like "0x169F59F7"; compute signed/unsigned
+  int forms from the same 32-bit value.
+- Web deep link to one entry:
+  https://quitfil3.github.io/rdr3-explorer/#/c/<id>?sel=<name>
+  (add &selg=<groupName> for groups-kind datasets)
+- Web search UI: https://quitfil3.github.io/rdr3-explorer/#/search?q=<text>
+
+## Notes for agents
+
+- Everything is static and cacheable. Larger files: anims.json ~10 MB,
+  objects.json / clothes.json ~1.2 MB — fetch the manifest first and only the
+  datasets you need.
+- Use exact names from the datasets when generating RedM Lua code; do not
+  invent model/anim/sound names.
+- Data source: https://github.com/femga/rdr3_discoveries
+- Site repository: https://github.com/QUITFIL3/rdr3-explorer

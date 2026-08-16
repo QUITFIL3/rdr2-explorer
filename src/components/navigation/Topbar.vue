@@ -7,7 +7,7 @@ import Icon from '../common/Icon.vue'
 
 defineEmits(['open-palette', 'toggle-menu'])
 
-const markUrl = import.meta.env.BASE_URL + 'brand/hexa-mark.png'
+const markUrl = import.meta.env.BASE_URL + 'brand/hexa-mark-clear.png'
 </script>
 
 <template>
@@ -53,7 +53,10 @@ const markUrl = import.meta.env.BASE_URL + 'brand/hexa-mark.png'
 <style>
 .topbar {
   height: var(--topbar-h);
-  display: flex;
+  /* 1fr | search | 1fr keeps the search truly centered regardless of how wide
+     the logo and the action cluster are */
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 520px) 1fr;
   align-items: center;
   gap: var(--sp-4);
   padding: 0 var(--sp-4);
@@ -70,14 +73,13 @@ const markUrl = import.meta.env.BASE_URL + 'brand/hexa-mark.png'
   gap: var(--sp-2);
   color: var(--text-primary);
   flex-shrink: 0;
+  /* keep the clickable area on the content, not the whole 1fr grid column */
+  justify-self: start;
 }
 .logo:hover { text-decoration: none; }
-.logo-mark {
-  border-radius: var(--radius-sm);
-  /* the mark ships on its own near-black plate, so it reads on either theme */
-  border: 1px solid var(--border-primary);
-  flex-shrink: 0;
-}
+.logo-mark { flex-shrink: 0; }
+/* the mark is silver on transparent — darken it so it reads on the light theme */
+:root[data-theme='light'] .logo-mark { filter: brightness(0.35); }
 .logo-text {
   font-family: var(--font-logo);
   font-size: var(--fs-lg);
@@ -86,8 +88,7 @@ const markUrl = import.meta.env.BASE_URL + 'brand/hexa-mark.png'
 }
 
 .global-search {
-  flex: 1;
-  max-width: 520px;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: var(--sp-2);
@@ -123,22 +124,24 @@ kbd {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  margin-left: auto;
+  justify-self: end;
   flex-shrink: 0;
 }
 .dev-flag { font-family: var(--font-mono); letter-spacing: 0.05em; }
 .icon-btn.lang { width: auto; padding: 0 var(--sp-2); font-size: var(--fs-sm); font-weight: 600; }
 
-.menu-btn { display: none; }
+/* double class: must out-rank .icon-btn's display:flex in components.css,
+   which loads after this SFC's styles */
+.icon-btn.menu-btn { display: none; }
 
 @media (max-width: 720px) {
-  .menu-btn { display: flex; }
-  .topbar { gap: var(--sp-2); padding: 0 var(--sp-3); }
+  .icon-btn.menu-btn { display: flex; }
+  /* back to a simple flex row: menu · logo · search icon · actions */
+  .topbar { display: flex; gap: var(--sp-2); padding: 0 var(--sp-3); }
   .gs-label { display: none; }
-  .global-search { flex: 0; margin-left: auto; }
+  .global-search { width: auto; margin-left: auto; }
   .global-search kbd { display: none; }
   .logo-text { font-size: var(--fs-md); }
-  .topbar-actions { margin-left: 0; }
 }
 
 /* very narrow phones: the wordmark no longer fits next to the action cluster */

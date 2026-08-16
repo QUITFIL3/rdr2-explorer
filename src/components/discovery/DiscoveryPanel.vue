@@ -45,8 +45,20 @@ const snippet = computed(() => {
   }
 })
 
+// x/y/z are collapsed into one copyable "x, y, z" row (see coordText)
+const COORD_KEYS = ['x', 'y', 'z']
+const coordText = computed(() => {
+  const e = props.entry
+  if (typeof e.x !== 'number' || typeof e.y !== 'number') return null
+  return COORD_KEYS.filter((k) => typeof e[k] === 'number')
+    .map((k) => e[k])
+    .join(', ')
+})
+
 const detailFields = computed(() =>
-  Object.entries(props.entry).filter(([k]) => k !== 'name' && k !== 'url')
+  Object.entries(props.entry).filter(
+    ([k]) => k !== 'name' && k !== 'url' && !(coordText.value && COORD_KEYS.includes(k))
+  )
 )
 
 ensurePreviews(props.cat)
@@ -123,12 +135,16 @@ function share() {
       <WorldMap :x="coords.x" :y="coords.y" :label="name" />
     </div>
 
-    <div v-if="detailFields.length" class="panel-section">
+    <div v-if="detailFields.length || coordText" class="panel-section">
       <div class="panel-label">{{ t('details') }}</div>
       <div class="detail-grid">
         <template v-for="[k, v] in detailFields" :key="k">
           <span class="detail-key">{{ k.replace('_', ' ') }}</span>
           <button class="detail-val mono" :title="t('copy') + ' ' + k" @click="copyText(String(v))">{{ v }}</button>
+        </template>
+        <template v-if="coordText">
+          <span class="detail-key">x, y, z</span>
+          <button class="detail-val mono" :title="t('copy') + ' x, y, z'" @click="copyText(coordText)">{{ coordText }}</button>
         </template>
       </div>
     </div>

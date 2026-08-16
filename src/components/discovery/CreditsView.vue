@@ -53,7 +53,7 @@ const SOURCES = [
 
 const TECH = ['Vue 3', 'Vite', 'Feather-style SVG icons', 'GitHub Pages']
 
-const logoUrl = import.meta.env.BASE_URL + 'brand/hexa-logo.png'
+const logoUrl = import.meta.env.BASE_URL + 'brand/hexa-logo-clear.png'
 </script>
 
 <template>
@@ -137,9 +137,10 @@ const logoUrl = import.meta.env.BASE_URL + 'brand/hexa-logo.png'
 .team-logo {
   width: 220px;
   max-width: 100%;
-  border-radius: var(--radius-md);
   display: block;
 }
+/* silver-on-transparent artwork — darken so it reads on the light theme */
+:root[data-theme='light'] .team-logo { filter: brightness(0.35); }
 .team-desc { color: var(--text-secondary); font-size: var(--fs-base); margin-top: var(--sp-1); }
 .team-links { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-3); }
 .team-links .chip { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-ui); }
