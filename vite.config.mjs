@@ -7,4 +7,11 @@ export default defineConfig({
   // multi-GB model image set never lands in the published site
   publicDir: process.env.DEPLOY_PAGES ? false : 'public',
   plugins: [vue()],
+  server: {
+    watch: {
+      // ~17k downloaded images live under public/images; watching them makes
+      // the dev server crawl (they are static and never edited by hand)
+      ignored: ['**/public/images/**'],
+    },
+  },
 })
