@@ -86,7 +86,11 @@ await Promise.all(
 console.log(`done: ${done} downloaded, ${skipped} already present, ${failed.length} failed`)
 if (failed.length) console.log(failed.slice(0, 50).join('\n'))
 
-// 4. write an index of available local model images for the frontend
-const index = wanted.map(([name]) => name).filter((n) => existsSync(join(OUT, n + '.jpg')))
+// 4. write the model-image index for the frontend: { name: exactRepoFilename }
+// (exact filename is needed to hotlink the CDN in production; local files are <name>.jpg)
+const index = {}
+for (const [name, path] of wanted) {
+  if (existsSync(join(OUT, name + '.jpg'))) index[name] = path.slice('objects/images/'.length)
+}
 writeFileSync(join(DATA, 'model_images.json'), JSON.stringify(index))
-console.log(`index written: ${index.length} names -> public/data/model_images.json`)
+console.log(`index written: ${Object.keys(index).length} names -> public/data/model_images.json`)

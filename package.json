@@ -8,6 +8,7 @@
     "download-images": "node scripts/download-images.mjs",
     "remove-backgrounds": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/remove-image-backgrounds.ps1",
     "download-model-images": "node scripts/download-model-images.mjs",
+    "deploy": "node scripts/deploy-pages.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"

@@ -5,6 +5,7 @@ import { copyText } from '../../lib/joaat.js'
 import { t, catDesc, catTitle } from '../../i18n.js'
 import { density } from '../../lib/storage.js'
 import { parseHash, replaceQuery } from '../../lib/router.js'
+import { MODEL_IMG_CATS, ensureModelIndex, modelPreviewUrl } from '../../lib/modelPreviews.js'
 import Icon from '../common/Icon.vue'
 import DiscoveryPanel from './DiscoveryPanel.vue'
 import CategoryMap from './CategoryMap.vue'
@@ -47,9 +48,9 @@ const fieldIdx = computed(() => {
 })
 
 const hasCoords = (props.cat.fields || []).includes('x') && (props.cat.fields || []).includes('y')
-const MODEL_IMG_CATS = new Set(['peds', 'vehicles', 'objects'])
 const hasModelImages = MODEL_IMG_CATS.has(props.cat.id)
 const hasGallery = !!props.cat.image || hasModelImages
+if (hasModelImages) ensureModelIndex()
 const viewMode = ref(hasCoords ? 'map' : props.cat.image ? 'gallery' : 'list')
 
 // ---------- URL state ----------
@@ -244,7 +245,7 @@ const galleryTiles = computed(() =>
     name: String(row[0]),
     src: props.cat.image
       ? TEX_BASE + row[fieldIdx.value.url]
-      : import.meta.env.BASE_URL + 'images/models/' + String(row[0]).toLowerCase() + '.jpg',
+      : modelPreviewUrl(String(row[0])), // null when no preview exists -> name-only tile
   }))
 )
 
@@ -369,10 +370,10 @@ function cycleSort() {
             v-for="tile in galleryTiles"
             :key="tile.name + (tile.row[3] || '')"
             class="tile"
-            :class="{ selected: selected && String(selected.name ?? selected[cat.fields[0]]) === tile.name }"
+            :class="{ selected: selected && String(selected.name ?? selected[cat.fields[0]]) === tile.name, 'no-img': !tile.src }"
             @click="selectRow(tile.row)"
           >
-            <div class="tile-img" :class="{ photo: hasModelImages }">
+            <div v-if="tile.src" class="tile-img" :class="{ photo: hasModelImages }">
               <img :src="tile.src" :alt="tile.name" loading="lazy" @error="$event.target.closest('.tile').classList.add('no-img')" />
             </div>
             <div class="tile-foot">

@@ -18,7 +18,7 @@ const modelImageCount = ref(0)
 onMounted(async () => {
   try {
     const res = await fetch(import.meta.env.BASE_URL + 'data/model_images.json')
-    if (res.ok) modelImageCount.value = (await res.json()).length
+    if (res.ok) modelImageCount.value = Object.keys(await res.json()).length
   } catch { /* index not generated yet — stat simply hidden */ }
 })
 

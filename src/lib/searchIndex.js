@@ -17,6 +17,9 @@ export function ensureIndex(manifest) {
   return startPromise
 }
 
+const yieldUI = () => new Promise((r) => setTimeout(r, 0))
+const CHUNK = 20000 // entries appended between yields, keeps the main thread responsive
+
 async function build(manifest) {
   const cats = [...manifest].sort((a, b) => a.count - b.count) // small files first
   const total = manifest.reduce((a, c) => a + c.count, 0) || 1
@@ -25,6 +28,12 @@ async function build(manifest) {
     try {
       const res = await fetch(import.meta.env.BASE_URL + `data/${c.id}.json`)
       const j = await res.json()
+      const startLen = entries.length
+      const yieldIfDue = async () => {
+        if ((entries.length - startLen) % CHUNK !== 0) return
+        indexProgress.value = Math.min((loaded + entries.length - startLen) / total, 0.99)
+        await yieldUI()
+      }
       if (j.kind === 'rows') {
         const hi = j.fields.indexOf('hash')
         for (const r of j.rows) {
@@ -33,19 +42,21 @@ async function build(manifest) {
             n, l: n.toLowerCase(), c: c.id, g: null,
             h: hi > 0 ? String(r[hi]).toLowerCase() : null,
           })
+          if (entries.length % CHUNK === 0) await yieldIfDue()
         }
       } else {
         for (const [gname, members] of Object.entries(j.groups)) {
           entries.push({ n: gname, l: gname.toLowerCase(), c: c.id, g: null, h: null })
           for (const m of members) {
             entries.push({ n: m, l: m.toLowerCase(), c: c.id, g: gname, h: null })
+            if (entries.length % CHUNK === 0) await yieldIfDue()
           }
         }
       }
     } catch { /* category failed to load; searchable set is just smaller */ }
     loaded += c.count
     indexProgress.value = loaded / total
-    await new Promise((r) => setTimeout(r, 0)) // yield so the UI stays responsive
+    await yieldUI()
   }
   indexReady.value = true
 }

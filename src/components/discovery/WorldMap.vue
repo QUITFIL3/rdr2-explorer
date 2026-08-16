@@ -45,7 +45,7 @@ const pos = computed(() => {
 <style>
 .world-map {
   position: relative;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   overflow: hidden;
   line-height: 0;
@@ -59,7 +59,7 @@ const pos = computed(() => {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-primary);
   border: 2px solid #fff;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35);
   transform: translate(-50%, -50%);

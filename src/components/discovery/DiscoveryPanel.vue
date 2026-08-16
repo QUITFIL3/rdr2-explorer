@@ -3,6 +3,7 @@ import { computed, ref, watch, watchEffect } from 'vue'
 import { CATEGORY_META, REPO_URL, TEX_BASE } from '../../categories.js'
 import { joaat, toHex, toSigned, copyText } from '../../lib/joaat.js'
 import { modelImageUrl } from '../../lib/modelImages.js'
+import { MODEL_IMG_CATS, ensureModelIndex, modelPreviewUrl } from '../../lib/modelPreviews.js'
 import { isBookmarked, toggleBookmark, pushRecent } from '../../lib/storage.js'
 import { entryUrl } from '../../lib/router.js'
 import { t } from '../../i18n.js'
@@ -48,10 +49,10 @@ const detailFields = computed(() =>
   Object.entries(props.entry).filter(([k]) => k !== 'name' && k !== 'url')
 )
 
-// image priority: texture url -> local model preview (peds/vehicles/objects) -> inventory icon
-const MODEL_IMG_CATS = new Set(['peds', 'vehicles', 'objects'])
+// image priority: texture url -> model preview (peds/vehicles/objects) -> inventory icon
 const modelImgFailed = ref(false)
 const resolvedIcon = ref(null)
+if (MODEL_IMG_CATS.has(props.cat.id)) ensureModelIndex()
 watchEffect(async () => {
   resolvedIcon.value = null
   modelImgFailed.value = false
@@ -63,7 +64,7 @@ watchEffect(async () => {
 const imageUrl = computed(() => {
   if (props.entry.url) return TEX_BASE + props.entry.url
   if (MODEL_IMG_CATS.has(props.cat.id) && !modelImgFailed.value) {
-    return import.meta.env.BASE_URL + 'images/models/' + name.value.toLowerCase() + '.jpg'
+    return modelPreviewUrl(name.value)
   }
   return resolvedIcon.value
 })

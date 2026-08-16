@@ -151,6 +151,8 @@ function onLeave() {
           preserveAspectRatio="none"
           :style="{ '--dr': dotR }"
         >
+          <!-- radius comes from the --dr CSS var so zooming never re-patches
+               thousands of circle vnodes (imaps has 8k+ points) -->
           <circle
             v-for="d in dots"
             :key="d.i"
@@ -158,14 +160,14 @@ function onLeave() {
             :data-i="d.i"
             :cx="d.cx"
             :cy="d.cy"
-            :r="dotR"
+            r="9"
           />
           <circle
             v-if="selDot"
             class="dot sel"
             :cx="selDot.cx"
             :cy="selDot.cy"
-            :r="dotR * 1.8"
+            r="16"
           />
         </svg>
       </div>
@@ -189,13 +191,13 @@ function onLeave() {
   width: min(100%, calc((100vh - 260px) * 2816 / 2304));
   aspect-ratio: 2816 / 2304;
   margin: 0 auto;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   overflow: hidden;
   cursor: grab;
   touch-action: none;
   user-select: none;
-  background: var(--surface);
+  background: var(--surface-primary);
 }
 .cat-map-wrap:active { cursor: grabbing; }
 
@@ -217,7 +219,8 @@ function onLeave() {
 }
 
 .cat-map-inner .dot {
-  fill: var(--accent);
+  r: calc(var(--dr, 9) * 1px); /* svg geometry via CSS; static r attr is the fallback */
+  fill: var(--accent-primary);
   fill-opacity: 0.75;
   stroke: #fff;
   stroke-width: calc(var(--dr, 9) * 0.25px);
@@ -226,6 +229,7 @@ function onLeave() {
 }
 .cat-map-inner .dot:hover { fill-opacity: 1; stroke-opacity: 1; }
 .cat-map-inner .dot.sel {
+  r: calc(var(--dr, 9) * 1.8px);
   fill: #2563eb;
   fill-opacity: 1;
   stroke: #fff;
@@ -252,7 +256,7 @@ function onLeave() {
   top: 8px;
   right: 8px;
   z-index: 3;
-  background: var(--surface);
+  background: var(--surface-primary);
 }
 
 .cat-map-count {
@@ -271,7 +275,7 @@ function onLeave() {
 .cat-map-hint {
   margin-top: 8px;
   font-size: 11.5px;
-  color: var(--dim);
+  color: var(--text-muted);
   text-align: center;
 }
 </style>
