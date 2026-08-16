@@ -4,6 +4,7 @@ import { CATEGORY_META } from '../../categories.js'
 import { t, catTitle } from '../../i18n.js'
 import { bookmarks, toggleBookmark } from '../../lib/storage.js'
 import { entryUrl } from '../../lib/router.js'
+import { copyText } from '../../lib/joaat.js'
 import Icon from '../common/Icon.vue'
 
 const props = defineProps({ manifest: { type: Array, required: true } })
@@ -15,6 +16,14 @@ const grouped = computed(() => {
   for (const b of bookmarks.value) (g[b.cat] ||= []).push(b)
   return Object.entries(g).map(([cat, items]) => ({ cat, items }))
 })
+
+// ready-to-paste Lua table; grouped entries keep their dictionary
+function copyLua(items) {
+  const lines = items.map((b) =>
+    b.group ? `  { group = "${b.group}", name = "${b.name}" },` : `  "${b.name}",`
+  )
+  copyText('{\n' + lines.join('\n') + '\n}')
+}
 </script>
 
 <template>
@@ -33,6 +42,9 @@ const grouped = computed(() => {
           <Icon :name="CATEGORY_META[grp.cat]?.icon || 'box'" :size="12" />
           {{ catById[grp.cat] ? catTitle(catById[grp.cat]) : grp.cat }}
         </span>
+        <button class="chip small accent" :title="t('copyLua')" @click="copyLua(grp.items)">
+          {{ t('copyLua') }}
+        </button>
       </div>
       <div class="row-list">
         <div v-for="b in grp.items" :key="(b.group || '') + b.name" class="row">
