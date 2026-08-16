@@ -1,18 +1,20 @@
-// Unified preview-image resolver for every category that can show one.
+// Unified preview-image resolver.
 //
-// Three sources, in priority order per category:
-//   1. texture categories (cat.image)      -> the row's own `url` field
-//   2. model categories (peds/vehicles/...) -> model_images.json index
-//   3. item categories (weapons/ammo/...)   -> matched inventory icon texture
+// Every rows-kind category tries three sources in order:
+//   1. the row's own `url` field       (texture categories)
+//   2. model_images.json               (rendered model screenshots)
+//   3. matched icon texture            (item/component names)
+//
+// Whatever resolves first wins; entries that match nothing show a placeholder.
+// Group-kind categories (animations, soundsets, scenarios) have no image source
+// in existence, so they never attempt a lookup.
 //
 // Indexes load once, lazily, and are shared by the list, gallery and panel.
 import { shallowRef } from 'vue'
 import { TEX_BASE } from '../categories.js'
 
-// categories whose entries map to a rendered model screenshot
-export const MODEL_CATS = new Set(['peds', 'vehicles', 'objects'])
-// categories whose entry names resolve to an inventory icon texture
-export const ICON_CATS = new Set(['weapons', 'ammo', 'pickups'])
+// categories whose entries are primarily model names (tiles render as photos)
+export const MODEL_CATS = new Set(['peds', 'vehicles', 'objects', 'doors', 'markers', 'imaps'])
 
 // deployed builds hotlink the model screenshots (the local set is multi-GB)
 const CDN_BASE = import.meta.env.VITE_MODEL_IMG_BASE || ''
@@ -31,31 +33,49 @@ function loadModelIndex() {
   return modelPromise
 }
 
+// Icon sources, most specific first — a weapon should match its inventory icon
+// before a same-named menu or HUD sprite.
+const ICON_SOURCES = [
+  'tex_inventory_items',
+  'tex_menu_items',
+  'tex_ui_hud',
+  'tex_collectors_bag',
+  'tex_multiwheel_emotes',
+]
+
 function loadIconIndex() {
-  iconPromise ||= fetch(import.meta.env.BASE_URL + 'data/tex_inventory_items.json')
-    .then((r) => (r.ok ? r.json() : null))
-    .catch(() => null)
-    .then((j) => {
-      const m = new Map()
-      if (j) {
-        const ni = j.fields.indexOf('name')
-        const ui = j.fields.indexOf('url')
-        for (const r of j.rows) m.set(String(r[ni]).toLowerCase(), r[ui])
+  iconPromise ||= Promise.all(
+    ICON_SOURCES.map((id) =>
+      fetch(import.meta.env.BASE_URL + `data/${id}.json`)
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null)
+    )
+  ).then((sets) => {
+    const m = new Map()
+    for (const j of sets) {
+      if (!j) continue
+      const ni = j.fields.indexOf('name')
+      const ui = j.fields.indexOf('url')
+      for (const r of j.rows) {
+        const k = String(r[ni]).toLowerCase()
+        if (!m.has(k)) m.set(k, r[ui]) // earlier source wins
       }
-      return (iconIndex.value = m)
-    })
+    }
+    return (iconIndex.value = m)
+  })
   return iconPromise
 }
 
-// True when this category can show preview images at all.
+// Group-kind categories (animation dicts, soundsets, scenarios) name behaviours,
+// not assets — no image source exists for them anywhere.
 export function categoryHasPreviews(cat) {
-  return !!cat.image || MODEL_CATS.has(cat.id) || ICON_CATS.has(cat.id)
+  return !!cat.image || cat.kind === 'rows'
 }
 
-// Kick off whatever index this category needs. Safe to call repeatedly.
+// Kick off the indexes this category needs. Safe to call repeatedly.
 export function ensurePreviews(catId) {
-  if (MODEL_CATS.has(catId)) loadModelIndex()
-  else if (ICON_CATS.has(catId)) loadIconIndex()
+  loadModelIndex()
+  loadIconIndex()
 }
 
 // Item names carry qualifiers the icon set does not ("weapon_melee_knife_dutch"
@@ -85,12 +105,9 @@ export function preview(catId, name, textureUrl) {
     const u = TEX_BASE + textureUrl
     return { thumb: u, full: u } // texture art is already tiny
   }
-  if (MODEL_CATS.has(catId)) {
-    const idx = modelIndex.value
-    if (!idx) return null
-    const n = String(name).toLowerCase()
-    const file = idx[n]
-    if (!file) return null
+  const n = String(name).toLowerCase()
+  const file = modelIndex.value?.[n]
+  if (file) {
     if (CDN_BASE) {
       const u = CDN_BASE + file
       return { thumb: u, full: u } // no downscaled variant exists on the CDN
@@ -98,11 +115,8 @@ export function preview(catId, name, textureUrl) {
     const base = import.meta.env.BASE_URL + 'images/models/'
     return { thumb: base + 'thumbs/' + n + '.jpg', full: base + n + '.jpg' }
   }
-  if (ICON_CATS.has(catId)) {
-    const hit = lookupIcon(name)
-    if (!hit) return null
-    const u = TEX_BASE + hit
-    return { thumb: u, full: u }
-  }
-  return null
+  const hit = lookupIcon(name)
+  if (!hit) return null
+  const u = TEX_BASE + hit
+  return { thumb: u, full: u }
 }

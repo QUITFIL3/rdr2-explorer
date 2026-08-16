@@ -11,6 +11,7 @@ export function parseHash() {
   const m = path.match(/^\/c\/([\w-]+)/)
   if (m) return { page: 'cat', id: m[1], query }
   if (path === '/bookmarks') return { page: 'bookmarks', id: null, query }
+  if (path === '/credits') return { page: 'credits', id: null, query }
   return { page: 'home', id: null, query }
 }
 

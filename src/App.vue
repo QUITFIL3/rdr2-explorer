@@ -6,6 +6,7 @@ import CommandPalette from './components/navigation/CommandPalette.vue'
 import HomeView from './components/discovery/HomeView.vue'
 import CategoryView from './components/discovery/CategoryView.vue'
 import BookmarksView from './components/discovery/BookmarksView.vue'
+import CreditsView from './components/discovery/CreditsView.vue'
 import { parseHash } from './lib/router.js'
 import { t } from './i18n.js'
 import { ensureIndex } from './lib/searchIndex.js'
@@ -73,6 +74,7 @@ const reload = () => location.reload()
           :route-tick="routeTick"
         />
         <BookmarksView v-else-if="route.page === 'bookmarks'" :manifest="manifest" />
+        <CreditsView v-else-if="route.page === 'credits'" :manifest="manifest" />
         <HomeView v-else :manifest="manifest" @open-palette="openPalette" />
       </main>
     </div>

@@ -41,6 +41,10 @@ function toggleGroup(name) {
         <span class="nav-label">{{ t('bookmarks') }}</span>
         <span v-if="bookmarks.length" class="nav-count">{{ bookmarks.length }}</span>
       </a>
+      <a href="#/credits" class="nav-item" :class="{ active: route.page === 'credits' }">
+        <span class="nav-icon"><Icon name="award" :size="14" /></span>
+        <span class="nav-label">{{ t('credits') }}</span>
+      </a>
 
       <div v-for="grp in grouped" :key="grp.name" class="nav-group">
         <button class="nav-group-title" @click="toggleGroup(grp.name)">
@@ -69,8 +73,8 @@ function toggleGroup(name) {
     </nav>
 
     <div class="sidebar-footer">
-      <div>{{ t('dataFrom') }} <a href="https://github.com/femga/rdr3_discoveries" target="_blank" rel="noopener">femga/rdr3_discoveries</a></div>
-      <div class="credit">{{ t('creditImages') }}</div>
+      <div><a href="#/credits">Hexa Development</a></div>
+      <div class="credit">{{ t('dataFrom') }} <a href="https://github.com/femga/rdr3_discoveries" target="_blank" rel="noopener">femga/rdr3_discoveries</a></div>
     </div>
   </aside>
 </template>

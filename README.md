@@ -85,8 +85,34 @@ scripts/
 [jeanropke/RDR2CollectorsMap](https://github.com/jeanropke/RDR2CollectorsMap):
 `lat = 0.01552y − 63.6`, `lng = 0.01552x + 111.29` (map space 176×144)
 
-## เครดิตข้อมูล
+## เครดิต
 
-- ข้อมูลเกมทั้งหมด: [femga/rdr3_discoveries](https://github.com/femga/rdr3_discoveries)
-- รูปโมเดล ped/vehicle/object: [BryceCanyonCounty/rdr3-nativedb-data](https://github.com/BryceCanyonCounty/rdr3-nativedb-data) (RedLookup.com)
-- ภาพเกมเป็นลิขสิทธิ์ของ Rockstar Games — ใช้เพื่อการศึกษา/อ้างอิงของชุมชนนักพัฒนา
+### จัดทำโดย
+
+**[Hexa Development](https://github.com/hexa-development)** — ทีมพัฒนาเซิร์ฟเวอร์และเครื่องมือสำหรับ RedM
+ดูแลคลังข้อมูลนี้เป็นแหล่งข้อมูลฟรีสำหรับชุมชนนักพัฒนา RDR2 / RedM
+
+- repo หลัก: [QUITFIL3/rdr3-explorer](https://github.com/QUITFIL3/rdr3-explorer)
+- fork ขององค์กร: [hexa-development/rdr3-explorer](https://github.com/hexa-development/rdr3-explorer)
+- เว็บไซต์: https://quitfil3.github.io/rdr3-explorer/
+
+### แหล่งข้อมูล
+
+| แหล่ง | ใช้ทำอะไร | สัญญาอนุญาต |
+| --- | --- | --- |
+| [femga/rdr3_discoveries](https://github.com/femga/rdr3_discoveries) | ข้อมูลเกมทั้งหมด 411,071 รายการใน 39 หมวด (ตัวละคร อาวุธ แอนิเมชัน ซีนาริโอ เสียง เอฟเฟกต์ ข้อมูลโลก เท็กซ์เจอร์) | โครงการวิจัยของชุมชน |
+| [BryceCanyonCounty/rdr3-nativedb-data](https://github.com/BryceCanyonCounty/rdr3-nativedb-data) | ภาพตัวอย่างโมเดล 9,029 รูป (ตัวละคร ยานพาหนะ พร็อพ) — เบื้องหลัง RedLookup.com | GPL-3.0 |
+| [jeanropke/RDR2CollectorsMap](https://github.com/jeanropke/RDR2CollectorsMap) | สูตรแปลงพิกัดในเกม → ตำแหน่งบนแผนที่ | MIT |
+| [Rockstar Games](https://www.rockstargames.com/reddeadredemption2) | Red Dead Redemption 2 — ทรัพยากรในเกม ภาพหน้าจอ และภาพแผนที่ | © Rockstar Games |
+| [Kanit — Cadson Demak](https://fonts.google.com/specimen/Kanit) | ฟอนต์หลักของหน้าเว็บ (ไทย + อังกฤษ) | SIL Open Font License 1.1 |
+
+### เทคโนโลยี
+
+Vue 3 · Vite · ไอคอน SVG แบบ inline (feather-style) · GitHub Pages + GitHub Actions
+
+### ข้อจำกัดความรับผิดชอบ
+
+เว็บนี้เป็นเครื่องมืออ้างอิงที่แฟนเกมจัดทำขึ้นอย่างไม่เป็นทางการ **ไม่มีความเกี่ยวข้อง**
+กับ Rockstar Games หรือ Take-Two Interactive
+ทรัพยากรในเกม ชื่อ และรูปภาพทั้งหมดเป็นทรัพย์สินของเจ้าของลิขสิทธิ์
+แสดงที่นี่เพื่อการศึกษาและอ้างอิงในการพัฒนาเท่านั้น
