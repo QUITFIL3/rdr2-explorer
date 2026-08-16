@@ -1,0 +1,573 @@
+[
+  {
+    "id": "peds",
+    "title": "Peds",
+    "src": "peds/peds_list.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "outfits"
+    ],
+    "count": 1983
+  },
+  {
+    "id": "weapons",
+    "title": "Weapons",
+    "src": "weapons/weapons.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "group",
+      "status"
+    ],
+    "count": 117,
+    "facets": [
+      "group",
+      "status"
+    ]
+  },
+  {
+    "id": "weapon_components",
+    "title": "Weapon Components",
+    "src": "weapons/weapon_components.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "weapon",
+      "slot"
+    ],
+    "count": 800,
+    "facets": [
+      "weapon",
+      "slot"
+    ]
+  },
+  {
+    "id": "ammo",
+    "title": "Ammo Types",
+    "src": "weapons/ammo_types.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash"
+    ],
+    "count": 77
+  },
+  {
+    "id": "pickups",
+    "title": "Pickups",
+    "src": "objects/pickup_list.lua",
+    "kind": "rows",
+    "fields": [
+      "name"
+    ],
+    "count": 147
+  },
+  {
+    "id": "vehicles",
+    "title": "Vehicles",
+    "src": "vehicles/vehicles_list.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash"
+    ],
+    "count": 115
+  },
+  {
+    "id": "objects",
+    "title": "Objects / Props",
+    "src": "objects/object_list.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "source"
+    ],
+    "count": 20471
+  },
+  {
+    "id": "clothes",
+    "title": "Clothes",
+    "src": "clothes/cloth_hash_names.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "category",
+      "ped_type",
+      "mode"
+    ],
+    "count": 16281,
+    "facets": [
+      "category",
+      "ped_type",
+      "mode"
+    ]
+  },
+  {
+    "id": "anims",
+    "title": "Animations",
+    "src": "animations/ingameanims/ingameanims_list.lua",
+    "kind": "groups",
+    "count": 336087,
+    "groupCount": 40182,
+    "groupLabel": "anim dict",
+    "itemLabel": "anim name"
+  },
+  {
+    "id": "scenarios",
+    "title": "Scenarios",
+    "src": "animations/scenarios/scenario_types_with_conditional_anims.lua",
+    "kind": "groups",
+    "count": 3144,
+    "groupCount": 1493,
+    "groupLabel": "scenario type",
+    "itemLabel": "conditional anim"
+  },
+  {
+    "id": "emotes",
+    "title": "Emotes",
+    "src": "animations/kit_emotes_list/kit_emotes_list.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "group"
+    ],
+    "count": 121,
+    "facets": [
+      "group"
+    ]
+  },
+  {
+    "id": "soundsets",
+    "title": "Soundsets",
+    "src": "audio/soundsets/soundsets.lua",
+    "kind": "groups",
+    "count": 262,
+    "groupCount": 111,
+    "groupLabel": "soundset",
+    "itemLabel": "sound name"
+  },
+  {
+    "id": "frontend_soundsets",
+    "title": "Frontend Soundsets",
+    "src": "audio/frontend_soundsets/frontend_soundsets.lua",
+    "kind": "groups",
+    "count": 165,
+    "groupCount": 57,
+    "groupLabel": "soundset",
+    "itemLabel": "sound name"
+  },
+  {
+    "id": "music_events",
+    "title": "Music Events",
+    "src": "audio/music_events/music_events.lua",
+    "kind": "rows",
+    "fields": [
+      "name"
+    ],
+    "count": 3478
+  },
+  {
+    "id": "audio_banks",
+    "title": "Audio Banks",
+    "src": "audio/audio_banks/audio_banks.lua",
+    "kind": "rows",
+    "fields": [
+      "name"
+    ],
+    "count": 7809
+  },
+  {
+    "id": "animpostfx",
+    "title": "AnimPostFX (screen effects)",
+    "src": "graphics/animpostfx/animpostfx.lua",
+    "kind": "rows",
+    "fields": [
+      "name"
+    ],
+    "count": 348
+  },
+  {
+    "id": "ptfx",
+    "title": "Particle Effects",
+    "src": "graphics/ptfx",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "asset",
+      "type"
+    ],
+    "count": 2317,
+    "facets": [
+      "type"
+    ]
+  },
+  {
+    "id": "timecycles",
+    "title": "Timecycle Modifiers",
+    "src": "graphics/timecycles/timecycles.lua",
+    "kind": "rows",
+    "fields": [
+      "name"
+    ],
+    "count": 991
+  },
+  {
+    "id": "markers",
+    "title": "Marker Types",
+    "src": "graphics/markers/marker_types.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash"
+    ],
+    "count": 26
+  },
+  {
+    "id": "explosion_vfx",
+    "title": "Explosion VFX Tags",
+    "src": "graphics/explosions/explosion_vfxTags.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash"
+    ],
+    "count": 26
+  },
+  {
+    "id": "text_colors",
+    "title": "Text Colors",
+    "src": "useful_info_from_rpfs/colours",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "shortcode",
+      "url"
+    ],
+    "count": 380,
+    "image": true
+  },
+  {
+    "id": "weather",
+    "title": "Weather Types",
+    "src": "weather/weather_types.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash"
+    ],
+    "count": 22
+  },
+  {
+    "id": "doors",
+    "title": "Door Hashes",
+    "src": "doorHashes/doorhashes.lua",
+    "kind": "rows",
+    "fields": [
+      "model",
+      "doorhash",
+      "x",
+      "y",
+      "z"
+    ],
+    "count": 1751
+  },
+  {
+    "id": "interiors",
+    "title": "Interiors",
+    "src": "interiors/interiors_coords_and_hashes.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "interior_id",
+      "x",
+      "y",
+      "z",
+      "rpf"
+    ],
+    "count": 311
+  },
+  {
+    "id": "imaps",
+    "title": "IMAPs (map parts)",
+    "src": "imaps/imaps_with_coords_and_heading.lua",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "x",
+      "y",
+      "z"
+    ],
+    "count": 8050
+  },
+  {
+    "id": "controls",
+    "title": "Controls",
+    "src": "Controls",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "keyboard",
+      "xbox",
+      "context"
+    ],
+    "count": 680
+  },
+  {
+    "id": "zones",
+    "title": "Zones",
+    "src": "zones",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "type",
+      "type_id"
+    ],
+    "count": 320,
+    "facets": [
+      "type"
+    ]
+  },
+  {
+    "id": "tex_blips",
+    "title": "Blips",
+    "src": "useful_info_from_rpfs/textures/blips",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 321,
+    "image": true
+  },
+  {
+    "id": "tex_blips_mp",
+    "title": "Blips (MP)",
+    "src": "useful_info_from_rpfs/textures/blips_mp",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 267,
+    "image": true
+  },
+  {
+    "id": "tex_inventory_items",
+    "title": "Inventory Items",
+    "src": "useful_info_from_rpfs/textures/inventory_items",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 1201,
+    "image": true,
+    "facets": [
+      "dict"
+    ]
+  },
+  {
+    "id": "tex_menu_items",
+    "title": "Menu Items",
+    "src": "useful_info_from_rpfs/textures/menu_items",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 193,
+    "image": true,
+    "facets": [
+      "dict"
+    ]
+  },
+  {
+    "id": "tex_menu_textures",
+    "title": "Menu Textures",
+    "src": "useful_info_from_rpfs/textures/menu_textures",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 126,
+    "image": true,
+    "facets": [
+      "dict"
+    ]
+  },
+  {
+    "id": "tex_multiwheel_emotes",
+    "title": "Emote Wheel",
+    "src": "useful_info_from_rpfs/textures/multiwheel_emotes",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 136,
+    "image": true
+  },
+  {
+    "id": "tex_overhead",
+    "title": "Overhead Icons",
+    "src": "useful_info_from_rpfs/textures/overhead",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 54,
+    "image": true
+  },
+  {
+    "id": "tex_awards",
+    "title": "Awards (MP)",
+    "src": "useful_info_from_rpfs/textures/pm_awards_mp",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 180,
+    "image": true
+  },
+  {
+    "id": "tex_collectors_bag",
+    "title": "Collectors Bag",
+    "src": "useful_info_from_rpfs/textures/pm_collectors_bag_mp",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 189,
+    "image": true
+  },
+  {
+    "id": "tex_ui_hud",
+    "title": "HUD Textures",
+    "src": "useful_info_from_rpfs/textures/ui_hud____part_1",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 998,
+    "image": true,
+    "facets": [
+      "dict"
+    ]
+  },
+  {
+    "id": "tex_ui_mp",
+    "title": "MP UI Textures",
+    "src": "useful_info_from_rpfs/textures/ui_textures_mp____part1",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 1545,
+    "image": true,
+    "facets": [
+      "dict"
+    ]
+  },
+  {
+    "id": "tex_startup",
+    "title": "Startup Art",
+    "src": "useful_info_from_rpfs/textures/ui_startup_textures",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 257,
+    "image": true,
+    "facets": [
+      "dict"
+    ]
+  },
+  {
+    "id": "tex_swatches",
+    "title": "UI Swatches",
+    "src": "useful_info_from_rpfs/textures/ui_swatches",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 60,
+    "image": true
+  },
+  {
+    "id": "tex_cards",
+    "title": "Playing Cards",
+    "src": "useful_info_from_rpfs/textures/ui_minigames/cards",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 477,
+    "image": true,
+    "facets": [
+      "dict"
+    ]
+  },
+  {
+    "id": "tex_domino",
+    "title": "Dominoes",
+    "src": "useful_info_from_rpfs/textures/ui_minigames/domino",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "dict",
+      "url"
+    ],
+    "count": 168,
+    "image": true,
+    "facets": [
+      "dict"
+    ]
+  }
+]
