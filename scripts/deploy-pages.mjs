@@ -34,6 +34,10 @@ cpSync(join(ROOT, 'public', 'manifest.webmanifest'), join(DIST, 'manifest.webman
 cpSync(join(ROOT, 'public', 'sw.js'), join(DIST, 'sw.js'))
 // single-file MCP server, downloadable straight from the site (no clone)
 cpSync(join(ROOT, 'scripts', 'mcp-server.mjs'), join(DIST, 'mcp-server.mjs'))
+
+console.log('prerendering category pages for search engines...')
+const { prerender } = await import('./prerender.mjs')
+prerender(DIST)
 writeFileSync(join(DIST, '.nojekyll'), '')
 
 // texture samples (~200MB) are git-ignored and only exist on a dev machine.
