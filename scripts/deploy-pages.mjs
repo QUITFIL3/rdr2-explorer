@@ -32,6 +32,8 @@ cpSync(join(ROOT, 'public', 'sitemap.xml'), join(DIST, 'sitemap.xml'))
 cpSync(join(ROOT, 'public', 'llms.txt'), join(DIST, 'llms.txt'))
 cpSync(join(ROOT, 'public', 'manifest.webmanifest'), join(DIST, 'manifest.webmanifest'))
 cpSync(join(ROOT, 'public', 'sw.js'), join(DIST, 'sw.js'))
+// single-file MCP server, downloadable straight from the site (no clone)
+cpSync(join(ROOT, 'scripts', 'mcp-server.mjs'), join(DIST, 'mcp-server.mjs'))
 writeFileSync(join(DIST, '.nojekyll'), '')
 
 // texture samples (~200MB) are git-ignored and only exist on a dev machine.

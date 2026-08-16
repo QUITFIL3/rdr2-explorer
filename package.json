@@ -3,6 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "bin": { "rdr2-explorer-mcp": "scripts/mcp-server.mjs" },
+  "files": ["scripts/mcp-server.mjs"],
   "scripts": {
     "parse-data": "node scripts/parse-data.mjs",
     "download-images": "node scripts/download-images.mjs",

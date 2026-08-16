@@ -56,8 +56,10 @@
   datasets you need.
 - Use exact names from the datasets when generating RedM Lua code; do not
   invent model/anim/sound names.
-- MCP server: clone the site repository and run
-  `node scripts/mcp-server.mjs` (stdio) — tools: list_categories, search
-  (names + reverse hash), get_entry, hash_name.
+- MCP server (stdio; tools: list_categories, search with reverse hash,
+  get_entry, hash_name) — run without cloning:
+  `npx -y github:QUITFIL3/rdr2-explorer`, or download the single file at
+  https://quitfil3.github.io/rdr2-explorer/mcp-server.mjs and run it with
+  `node mcp-server.mjs` (data is fetched from this site automatically).
 - Data source: https://github.com/femga/rdr3_discoveries
 - Site repository: https://github.com/QUITFIL3/rdr2-explorer
