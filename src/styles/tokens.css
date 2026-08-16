@@ -1,0 +1,122 @@
+/* ============================================================
+   RDR3 Discoveries — Design Tokens
+   Dark ("charcoal & brass western") is the primary theme.
+   Light is a warm-paper alternative.
+   Every component style must reference these tokens.
+   ============================================================ */
+
+:root {
+  /* ---------- color: dark (default) ---------- */
+  --bg-primary: #0d0c0b;
+  --bg-secondary: #121110;
+  --bg-tertiary: #171514;
+
+  --surface-primary: #161413;
+  --surface-hover: #1e1b19;
+  --surface-active: #262220;
+
+  --border-primary: #2b2723;
+  --border-muted: #201d1a;
+
+  --text-primary: #ece7df;
+  --text-secondary: #b3aa9d;
+  --text-muted: #7f776c;
+
+  --accent-primary: #d24a3a;      /* deep red — links, active, primary actions */
+  --accent-primary-dim: #a53527;
+  --accent-secondary: #c9a24b;    /* brass — bookmarks, subtle highlights */
+
+  --success: #5cab7d;
+  --warning: #d9a53f;
+  --danger: #e05252;
+  --info: #6a9fd8;
+
+  --code-bg: #0a0908;
+  --scrollbar: #2c2823;
+  --scrollbar-hover: #423c34;
+  --backdrop: rgba(0, 0, 0, 0.6);
+
+  /* ---------- typography ---------- */
+  --font-ui: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-logo: Georgia, 'Times New Roman', serif; /* western flavor: logo + rare headings only */
+  --font-mono: 'Cascadia Code', Consolas, 'JetBrains Mono', 'SF Mono', monospace;
+
+  --fs-xs: 10.5px;
+  --fs-sm: 11.5px;
+  --fs-base: 13px;
+  --fs-md: 14px;
+  --fs-lg: 16px;
+  --fs-xl: 22px;
+  --fs-hero: 28px;
+
+  /* ---------- spacing (4-base scale) ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* ---------- radius ---------- */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* ---------- elevation ---------- */
+  --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --shadow-pop: 0 4px 16px rgba(0, 0, 0, 0.35);
+
+  /* ---------- motion ---------- */
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+
+  /* ---------- z-index ---------- */
+  --z-topbar: 30;
+  --z-panel: 40;
+  --z-palette: 60;
+  --z-toast: 100;
+
+  /* ---------- layout ---------- */
+  --topbar-h: 52px;
+  --sidebar-w: 248px;
+  --panel-w: 420px;
+}
+
+/* ---------- color: light (warm paper) ---------- */
+:root[data-theme='light'] {
+  --bg-primary: #f7f4ee;
+  --bg-secondary: #f1ede5;
+  --bg-tertiary: #eae5da;
+
+  --surface-primary: #fdfcf9;
+  --surface-hover: #f0ebe2;
+  --surface-active: #e8e1d4;
+
+  --border-primary: #ddd5c7;
+  --border-muted: #e8e2d6;
+
+  --text-primary: #221e19;
+  --text-secondary: #5c554b;
+  --text-muted: #8d8478;
+
+  --accent-primary: #b03927;
+  --accent-primary-dim: #d8523c;
+  --accent-secondary: #8f6f1e;
+
+  --success: #2e7d54;
+  --warning: #9c6f13;
+  --danger: #c02f2f;
+  --info: #2f6cad;
+
+  --code-bg: #f2eee6;
+  --scrollbar: #d3ccbe;
+  --scrollbar-hover: #b5ad9d;
+  --backdrop: rgba(30, 25, 18, 0.35);
+
+  --shadow-panel: 0 8px 32px rgba(60, 50, 35, 0.18);
+  --shadow-pop: 0 4px 16px rgba(60, 50, 35, 0.14);
+}

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+
+# downloaded assets (multi-GB) — regenerate with:
+#   npm run download-images
+#   npm run remove-backgrounds
+#   npm run download-model-images
+public/images/samples/
+public/images/models/
+
+*.local
+.DS_Store

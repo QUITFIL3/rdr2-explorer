@@ -1,0 +1,22 @@
+{
+  "name": "rdr3-explorer",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "parse-data": "node scripts/parse-data.mjs",
+    "download-images": "node scripts/download-images.mjs",
+    "remove-backgrounds": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/remove-image-backgrounds.ps1",
+    "download-model-images": "node scripts/download-model-images.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.5.18"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "vite": "^7.1.3"
+  }
+}
