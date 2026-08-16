@@ -1,11 +1,13 @@
 <script setup>
 import { ref, shallowRef, computed, reactive, watch, onMounted } from 'vue'
-import { CATEGORY_META, TEX_BASE } from '../../categories.js'
+import { CATEGORY_META } from '../../categories.js'
 import { copyText } from '../../lib/joaat.js'
 import { t, catDesc, catTitle } from '../../i18n.js'
 import { density } from '../../lib/storage.js'
 import { parseHash, replaceQuery } from '../../lib/router.js'
-import { MODEL_IMG_CATS, ensureModelIndex, modelPreviewUrl } from '../../lib/modelPreviews.js'
+import {
+  categoryHasPreviews, ensurePreviews, previewUrl, isPhotoPreview,
+} from '../../lib/previews.js'
 import Icon from '../common/Icon.vue'
 import DiscoveryPanel from './DiscoveryPanel.vue'
 import CategoryMap from './CategoryMap.vue'
@@ -48,9 +50,9 @@ const fieldIdx = computed(() => {
 })
 
 const hasCoords = (props.cat.fields || []).includes('x') && (props.cat.fields || []).includes('y')
-const hasModelImages = MODEL_IMG_CATS.has(props.cat.id)
-const hasGallery = !!props.cat.image || hasModelImages
-if (hasModelImages) ensureModelIndex()
+const hasGallery = categoryHasPreviews(props.cat)
+const photoTiles = isPhotoPreview(props.cat.id, null)
+ensurePreviews(props.cat.id)
 const viewMode = ref(hasCoords ? 'map' : props.cat.image ? 'gallery' : 'list')
 
 // ---------- URL state ----------
@@ -239,14 +241,12 @@ const mapPoints = computed(() => {
   return filteredRows.value.map((row) => ({ x: row[xi], y: row[yi], name: String(row[0]), row }))
 })
 
+// null src -> the tile/row renders without an image rather than a broken one
+const rowPreview = (row) =>
+  previewUrl(props.cat.id, String(row[0]), props.cat.image ? row[fieldIdx.value.url] : null)
+
 const galleryTiles = computed(() =>
-  shownRows.value.map((row) => ({
-    row,
-    name: String(row[0]),
-    src: props.cat.image
-      ? TEX_BASE + row[fieldIdx.value.url]
-      : modelPreviewUrl(String(row[0])), // null when no preview exists -> name-only tile
-  }))
+  shownRows.value.map((row) => ({ row, name: String(row[0]), src: rowPreview(row) }))
 )
 
 const fmt = (n) => n.toLocaleString('en-US')
@@ -373,7 +373,7 @@ function cycleSort() {
             :class="{ selected: selected && String(selected.name ?? selected[cat.fields[0]]) === tile.name, 'no-img': !tile.src }"
             @click="selectRow(tile.row)"
           >
-            <div v-if="tile.src" class="tile-img" :class="{ photo: hasModelImages }">
+            <div v-if="tile.src" class="tile-img" :class="{ photo: photoTiles }">
               <img :src="tile.src" :alt="tile.name" loading="lazy" @error="$event.target.closest('.tile').classList.add('no-img')" />
             </div>
             <div class="tile-foot">
@@ -397,6 +397,15 @@ function cycleSort() {
             :class="{ selected: selected && selected[cat.fields[0]] === row[0] }"
             @click="selectRow(row)"
           >
+            <img
+              v-if="hasGallery && rowPreview(row)"
+              class="row-thumb"
+              :class="{ photo: photoTiles }"
+              :src="rowPreview(row)"
+              :alt="String(row[0])"
+              loading="lazy"
+              @error="$event.target.remove()"
+            />
             <span class="row-name">{{ row[0] }}</span>
             <span class="row-meta">
               <template v-for="(f, j) in cat.fields" :key="f">
@@ -517,6 +526,19 @@ function cycleSort() {
 .caret.open { transform: rotate(90deg); }
 .group-members { border-top: 1px solid var(--border-muted); }
 .row.member { padding-left: var(--sp-8); }
+
+/* inline row thumbnail (categories that have preview images) */
+.row-thumb {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+}
+.row-thumb.photo { width: 40px; object-fit: cover; background: var(--code-bg); }
+.density-dense .row-thumb { width: 18px; height: 18px; }
+.density-dense .row-thumb.photo { width: 30px; }
+.row-thumb + .row-name { flex: 1; }
 
 /* gallery */
 .gallery {

@@ -1,9 +1,8 @@
 <script setup>
-import { computed, ref, watch, watchEffect } from 'vue'
-import { CATEGORY_META, REPO_URL, TEX_BASE } from '../../categories.js'
+import { computed, ref, watch } from 'vue'
+import { CATEGORY_META, REPO_URL } from '../../categories.js'
 import { joaat, toHex, toSigned, copyText } from '../../lib/joaat.js'
-import { modelImageUrl } from '../../lib/modelImages.js'
-import { MODEL_IMG_CATS, ensureModelIndex, modelPreviewUrl } from '../../lib/modelPreviews.js'
+import { ensurePreviews, previewUrl, isPhotoPreview } from '../../lib/previews.js'
 import { isBookmarked, toggleBookmark, pushRecent } from '../../lib/storage.js'
 import { entryUrl } from '../../lib/router.js'
 import { t } from '../../i18n.js'
@@ -49,26 +48,13 @@ const detailFields = computed(() =>
   Object.entries(props.entry).filter(([k]) => k !== 'name' && k !== 'url')
 )
 
-// image priority: texture url -> model preview (peds/vehicles/objects) -> inventory icon
-const modelImgFailed = ref(false)
-const resolvedIcon = ref(null)
-if (MODEL_IMG_CATS.has(props.cat.id)) ensureModelIndex()
-watchEffect(async () => {
-  resolvedIcon.value = null
-  modelImgFailed.value = false
-  // reads name.value so this re-runs per entry
-  const n = name.value
-  if (props.entry.url || MODEL_IMG_CATS.has(props.cat.id)) return
-  resolvedIcon.value = await modelImageUrl(props.cat.id, n)
-})
-const imageUrl = computed(() => {
-  if (props.entry.url) return TEX_BASE + props.entry.url
-  if (MODEL_IMG_CATS.has(props.cat.id) && !modelImgFailed.value) {
-    return modelPreviewUrl(name.value)
-  }
-  return resolvedIcon.value
-})
-const photoStyle = computed(() => MODEL_IMG_CATS.has(props.cat.id) && !props.entry.url)
+ensurePreviews(props.cat.id)
+const imgFailed = ref(false)
+watch(name, () => (imgFailed.value = false))
+const imageUrl = computed(() =>
+  imgFailed.value ? null : previewUrl(props.cat.id, name.value, props.entry.url)
+)
+const photoStyle = computed(() => isPhotoPreview(props.cat.id, props.entry.url))
 
 const coords = computed(() => {
   const { x, y } = props.entry
@@ -120,12 +106,7 @@ function share() {
 
     <div v-if="imageUrl" class="panel-section">
       <div class="panel-img" :class="{ photo: photoStyle }">
-        <img
-          :src="imageUrl"
-          :alt="name"
-          loading="lazy"
-          @error="photoStyle ? (modelImgFailed = true) : (resolvedIcon = null)"
-        />
+        <img :src="imageUrl" :alt="name" loading="lazy" @error="imgFailed = true" />
       </div>
     </div>
 
