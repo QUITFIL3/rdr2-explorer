@@ -31,6 +31,9 @@ jobs:
       - name: Build
         env:
           VITE_MODEL_IMG_BASE: https://cdn.jsdelivr.net/gh/BryceCanyonCounty/rdr3-nativedb-data@master/objects/images/
+          # grid thumbnails go through a resizing proxy so tiles pull ~8KB WebP
+          # instead of the 165-400KB originals
+          VITE_MODEL_THUMB_PROXY: https://wsrv.nl/?url=
         run: npx vite build
       - run: touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v3

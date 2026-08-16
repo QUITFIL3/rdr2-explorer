@@ -53,6 +53,8 @@ const SOURCES = [
 ]
 
 const TECH = ['Vue 3', 'Vite', 'Feather-style SVG icons', 'GitHub Pages']
+
+const logoUrl = import.meta.env.BASE_URL + 'brand/hexa-logo.png'
 </script>
 
 <template>
@@ -65,7 +67,7 @@ const TECH = ['Vue 3', 'Vite', 'Feather-style SVG icons', 'GitHub Pages']
     <section class="credits-section">
       <div class="panel-label">{{ t('builtBy') }}</div>
       <div class="team-card">
-        <div class="team-name">Hexa Development</div>
+        <img class="team-logo" :src="logoUrl" alt="Hexa Development" loading="lazy" />
         <p class="team-desc">{{ t('teamDesc') }}</p>
         <div class="team-links">
           <a class="chip small" href="https://github.com/hexa-development" target="_blank" rel="noopener">
@@ -133,11 +135,11 @@ const TECH = ['Vue 3', 'Vite', 'Feather-style SVG icons', 'GitHub Pages']
   border-radius: var(--radius-lg);
   padding: var(--sp-4) var(--sp-5);
 }
-.team-name {
-  font-family: var(--font-logo);
-  font-size: var(--fs-lg);
-  font-weight: 700;
-  color: var(--accent-secondary);
+.team-logo {
+  width: 220px;
+  max-width: 100%;
+  border-radius: var(--radius-md);
+  display: block;
 }
 .team-desc { color: var(--text-secondary); font-size: var(--fs-base); margin-top: var(--sp-1); }
 .team-links { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-3); }

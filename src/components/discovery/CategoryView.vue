@@ -276,6 +276,18 @@ function openLightbox(name, img) {
   if (img) lightbox.value = { name, src: img.full }
 }
 
+// thumbnails may come from a resizing proxy; fall back to the original once,
+// then give up and show the placeholder
+function onThumbError(e, img) {
+  const el = e.target
+  if (img && el.src !== img.full) {
+    el.src = img.full
+    return
+  }
+  el.closest('.tile')?.classList.add('no-img')
+  el.remove()
+}
+
 const fmt = (n) => n.toLocaleString('en-US')
 const DENSITIES = ['comfortable', 'compact', 'dense']
 function cycleDensity() {
@@ -418,7 +430,7 @@ function cycleSort() {
                   :alt="tile.name"
                   loading="lazy"
                   decoding="async"
-                  @error="$event.target.closest('.tile').classList.add('no-img')"
+                  @error="onThumbError($event, tile.img)"
                 />
                 <button class="zoom-btn" :title="t('viewLarge')" @click.stop="openLightbox(tile.name, tile.img)">
                   <Icon name="maximize" :size="12" />

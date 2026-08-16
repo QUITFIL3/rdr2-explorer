@@ -5,12 +5,14 @@ import { REPO_URL } from '../../categories.js'
 import Icon from '../common/Icon.vue'
 
 defineEmits(['open-palette'])
+
+const markUrl = import.meta.env.BASE_URL + 'brand/hexa-mark.png'
 </script>
 
 <template>
   <header class="topbar">
     <a class="logo" href="#/">
-      <Icon name="star" :size="14" class="logo-star" />
+      <img class="logo-mark" :src="markUrl" alt="Hexa Development" width="26" height="26" />
       <span class="logo-text">RDR3 Discoveries</span>
     </a>
 
@@ -60,7 +62,12 @@ defineEmits(['open-palette'])
   flex-shrink: 0;
 }
 .logo:hover { text-decoration: none; }
-.logo-star { color: var(--accent-secondary); }
+.logo-mark {
+  border-radius: var(--radius-sm);
+  /* the mark ships on its own near-black plate, so it reads on either theme */
+  border: 1px solid var(--border-primary);
+  flex-shrink: 0;
+}
 .logo-text {
   font-family: var(--font-logo);
   font-size: var(--fs-lg);

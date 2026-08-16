@@ -16,8 +16,18 @@ import { TEX_BASE } from '../categories.js'
 // categories whose entries are primarily model names (tiles render as photos)
 export const MODEL_CATS = new Set(['peds', 'vehicles', 'objects', 'doors', 'markers', 'imaps'])
 
-// deployed builds hotlink the model screenshots (the local set is multi-GB)
+// Deployed builds hotlink the model screenshots (the local set is multi-GB).
+// Grids must not pull the 165KB-400KB originals, so thumbs go through an
+// on-the-fly resizing proxy: ~8KB WebP instead, ~50x less over the wire.
 const CDN_BASE = import.meta.env.VITE_MODEL_IMG_BASE || ''
+const THUMB_PROXY = import.meta.env.VITE_MODEL_THUMB_PROXY || ''
+const THUMB_W = 320
+
+function proxiedThumb(url) {
+  if (!THUMB_PROXY) return url
+  // the proxy takes the source without its scheme
+  return `${THUMB_PROXY}${encodeURIComponent(url.replace(/^https?:\/\//, ''))}&w=${THUMB_W}&output=webp&q=72`
+}
 
 const modelIndex = shallowRef(null) // { name: exactRepoFilename }
 const iconIndex = shallowRef(null) // Map(lowercased texture name -> url path)
@@ -110,7 +120,7 @@ export function preview(catId, name, textureUrl) {
   if (file) {
     if (CDN_BASE) {
       const u = CDN_BASE + file
-      return { thumb: u, full: u } // no downscaled variant exists on the CDN
+      return { thumb: proxiedThumb(u), full: u }
     }
     const base = import.meta.env.BASE_URL + 'images/models/'
     return { thumb: base + 'thumbs/' + n + '.jpg', full: base + n + '.jpg' }

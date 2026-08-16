@@ -15,6 +15,7 @@ const run = (cmd, opts = {}) => execSync(cmd, { stdio: 'inherit', cwd: ROOT, ...
 process.env.DEPLOY_PAGES = '1'
 process.env.VITE_MODEL_IMG_BASE =
   'https://cdn.jsdelivr.net/gh/BryceCanyonCounty/rdr3-nativedb-data@master/objects/images/'
+process.env.VITE_MODEL_THUMB_PROXY = 'https://wsrv.nl/?url='
 
 console.log('building (pages mode)...')
 rmSync(DIST, { recursive: true, force: true })
@@ -25,6 +26,7 @@ cpSync(join(ROOT, 'public', 'data'), join(DIST, 'data'), { recursive: true })
 cpSync(join(ROOT, 'public', 'images', 'samples'), join(DIST, 'images', 'samples'), { recursive: true })
 cpSync(join(ROOT, 'public', 'images', 'rdr2map.jpg'), join(DIST, 'images', 'rdr2map.jpg'))
 cpSync(join(ROOT, 'public', 'images', 'rdr2map_dark.jpg'), join(DIST, 'images', 'rdr2map_dark.jpg'))
+cpSync(join(ROOT, 'public', 'brand'), join(DIST, 'brand'), { recursive: true })
 cpSync(join(ROOT, 'public', 'robots.txt'), join(DIST, 'robots.txt'))
 cpSync(join(ROOT, 'public', 'sitemap.xml'), join(DIST, 'sitemap.xml'))
 writeFileSync(join(DIST, '.nojekyll'), '')
