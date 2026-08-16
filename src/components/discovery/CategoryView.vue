@@ -5,10 +5,10 @@ import { copyText } from '../../lib/joaat.js'
 import { t, catDesc, catTitle } from '../../i18n.js'
 import { density } from '../../lib/storage.js'
 import { parseHash, replaceQuery } from '../../lib/router.js'
-import {
-  categoryHasPreviews, ensurePreviews, previewUrl, isPhotoPreview,
-} from '../../lib/previews.js'
+import { categoryHasPreviews, ensurePreviews, preview } from '../../lib/previews.js'
 import Icon from '../common/Icon.vue'
+import Lightbox from '../common/Lightbox.vue'
+import Pagination from '../common/Pagination.vue'
 import DiscoveryPanel from './DiscoveryPanel.vue'
 import CategoryMap from './CategoryMap.vue'
 
@@ -32,14 +32,16 @@ const dq = ref('')
 let debounce
 watch(q, (v) => {
   clearTimeout(debounce)
-  debounce = setTimeout(() => { dq.value = v; limit.value = 300; glimit.value = 60 }, 200)
+  debounce = setTimeout(() => { dq.value = v; page.value = 1 }, 200)
 })
 
 const facetSel = reactive({})
 const facetValues = shallowRef({})
 const sortDir = ref('') // '' natural | 'asc' | 'desc'
-const limit = ref(300)
-const glimit = ref(60)
+const imagesFirst = ref(true)
+const page = ref(1)
+const PER_PAGE = 120 // rows/tiles per page
+const GROUPS_PER_PAGE = 40
 const expanded = reactive(new Set())
 const selected = ref(null)
 
@@ -51,9 +53,10 @@ const fieldIdx = computed(() => {
 
 const hasCoords = (props.cat.fields || []).includes('x') && (props.cat.fields || []).includes('y')
 const hasGallery = categoryHasPreviews(props.cat)
-const photoTiles = isPhotoPreview(props.cat.id, null)
 ensurePreviews(props.cat.id)
-const viewMode = ref(hasCoords ? 'map' : props.cat.image ? 'gallery' : 'list')
+// every category with previews opens as a tile grid; coordinate categories open on the map
+const defaultView = hasCoords ? 'map' : hasGallery ? 'gallery' : 'list'
+const viewMode = ref(defaultView)
 
 // ---------- URL state ----------
 function applyRoute() {
@@ -80,9 +83,7 @@ function syncUrl() {
   for (const f of props.cat.facets || []) {
     if (facetSel[f]) p.set('f_' + f, facetSel[f])
   }
-  if (viewMode.value !== (hasCoords ? 'map' : props.cat.image ? 'gallery' : 'list')) {
-    p.set('view', viewMode.value)
-  }
+  if (viewMode.value !== defaultView) p.set('view', viewMode.value)
   if (selected.value) {
     p.set('sel', String(selected.value.name ?? selected.value[props.cat.fields?.[0]]))
     if (selected.value.group) p.set('selg', selected.value.group)
@@ -166,6 +167,10 @@ const filteredRows = computed(() => {
     const dir = sortDir.value === 'asc' ? 1 : -1
     out.sort((a, b) => dir * String(a[0]).localeCompare(String(b[0])))
   }
+  // entries with a preview first, so the grid opens on actual images
+  if (imagesFirst.value && hasGallery && !props.cat.image) {
+    out.sort((a, b) => (rowPreview(b) ? 1 : 0) - (rowPreview(a) ? 1 : 0))
+  }
   return out
 })
 
@@ -188,8 +193,24 @@ const filteredGroups = computed(() => {
   return out
 })
 
-const shownRows = computed(() => filteredRows.value.slice(0, limit.value))
-const shownGroups = computed(() => filteredGroups.value.slice(0, glimit.value))
+const perPage = computed(() => (data.value?.kind === 'groups' ? GROUPS_PER_PAGE : PER_PAGE))
+const pageStart = computed(() => (page.value - 1) * perPage.value)
+const shownRows = computed(() =>
+  filteredRows.value.slice(pageStart.value, pageStart.value + perPage.value)
+)
+const shownGroups = computed(() =>
+  filteredGroups.value.slice(pageStart.value, pageStart.value + perPage.value)
+)
+// filters can shrink the result set below the current page
+watch([filteredRows, filteredGroups], () => {
+  const count = data.value?.kind === 'groups' ? filteredGroups.value.length : filteredRows.value.length
+  const maxPage = Math.max(1, Math.ceil(count / perPage.value))
+  if (page.value > maxPage) page.value = maxPage
+})
+function goToPage(p) {
+  page.value = p
+  document.querySelector('.main')?.scrollTo({ top: 0, behavior: 'smooth' })
+}
 const totalFiltered = computed(() =>
   data.value?.kind === 'groups'
     ? filteredGroups.value.reduce((a, g) => a + g.members.length, 0)
@@ -243,11 +264,17 @@ const mapPoints = computed(() => {
 
 // null src -> the tile/row renders without an image rather than a broken one
 const rowPreview = (row) =>
-  previewUrl(props.cat.id, String(row[0]), props.cat.image ? row[fieldIdx.value.url] : null)
+  preview(props.cat.id, String(row[0]), props.cat.image ? row[fieldIdx.value.url] : null)
 
 const galleryTiles = computed(() =>
-  shownRows.value.map((row) => ({ row, name: String(row[0]), src: rowPreview(row) }))
+  shownRows.value.map((row) => ({ row, name: String(row[0]), img: rowPreview(row) }))
 )
+
+// full-size image opened from a tile / row thumbnail
+const lightbox = ref(null)
+function openLightbox(name, img) {
+  if (img) lightbox.value = { name, src: img.full }
+}
 
 const fmt = (n) => n.toLocaleString('en-US')
 const DENSITIES = ['comfortable', 'compact', 'dense']
@@ -296,6 +323,16 @@ function cycleSort() {
         </button>
         <button class="chip small" :title="t('densityCompact')" @click="cycleDensity">
           <Icon name="list" :size="11" /> {{ t('density' + density[0].toUpperCase() + density.slice(1)) }}
+        </button>
+
+        <button
+          v-if="hasGallery && !cat.image"
+          class="chip small"
+          :class="{ on: imagesFirst }"
+          :title="t('imagesFirst')"
+          @click="imagesFirst = !imagesFirst"
+        >
+          <Icon name="image" :size="11" /> {{ t('imagesFirst') }}
         </button>
 
         <div v-if="hasCoords || hasGallery" class="view-toggle">
@@ -370,11 +407,27 @@ function cycleSort() {
             v-for="tile in galleryTiles"
             :key="tile.name + (tile.row[3] || '')"
             class="tile"
-            :class="{ selected: selected && String(selected.name ?? selected[cat.fields[0]]) === tile.name, 'no-img': !tile.src }"
+            :class="{ selected: selected && String(selected.name ?? selected[cat.fields[0]]) === tile.name, 'no-img': !tile.img }"
+            :title="tile.name"
             @click="selectRow(tile.row)"
           >
-            <div v-if="tile.src" class="tile-img" :class="{ photo: photoTiles }">
-              <img :src="tile.src" :alt="tile.name" loading="lazy" @error="$event.target.closest('.tile').classList.add('no-img')" />
+            <div class="tile-img">
+              <template v-if="tile.img">
+                <img
+                  :src="tile.img.thumb"
+                  :alt="tile.name"
+                  loading="lazy"
+                  decoding="async"
+                  @error="$event.target.closest('.tile').classList.add('no-img')"
+                />
+                <button class="zoom-btn" :title="t('viewLarge')" @click.stop="openLightbox(tile.name, tile.img)">
+                  <Icon name="maximize" :size="12" />
+                </button>
+              </template>
+              <div class="no-image-ph">
+                <Icon name="image" :size="20" />
+                <span>{{ t('noImage') }}</span>
+              </div>
             </div>
             <div class="tile-foot">
               <span class="tile-name mono" :title="tile.name">{{ tile.name }}</span>
@@ -382,9 +435,12 @@ function cycleSort() {
             </div>
           </div>
         </div>
-        <button v-if="filteredRows.length > limit" class="show-more btn" @click="limit += 400">
-          {{ t('showMore', { n: fmt(filteredRows.length - limit) }) }}
-        </button>
+        <Pagination
+          :page="page"
+          :total="filteredRows.length"
+          :per-page="perPage"
+          @update:page="goToPage"
+        />
       </template>
 
       <!-- rows list -->
@@ -400,10 +456,12 @@ function cycleSort() {
             <img
               v-if="hasGallery && rowPreview(row)"
               class="row-thumb"
-              :class="{ photo: photoTiles }"
-              :src="rowPreview(row)"
+              :src="rowPreview(row).thumb"
               :alt="String(row[0])"
               loading="lazy"
+              decoding="async"
+              :title="t('viewLarge')"
+              @click.stop="openLightbox(String(row[0]), rowPreview(row))"
               @error="$event.target.remove()"
             />
             <span class="row-name">{{ row[0] }}</span>
@@ -420,9 +478,12 @@ function cycleSort() {
             </span>
           </div>
         </div>
-        <button v-if="filteredRows.length > limit" class="show-more btn" @click="limit += 500">
-          {{ t('showMore', { n: fmt(filteredRows.length - limit) }) }}
-        </button>
+        <Pagination
+          :page="page"
+          :total="filteredRows.length"
+          :per-page="perPage"
+          @update:page="goToPage"
+        />
       </template>
 
       <!-- groups -->
@@ -451,9 +512,12 @@ function cycleSort() {
             </div>
           </div>
         </div>
-        <button v-if="filteredGroups.length > glimit" class="show-more btn" @click="glimit += 100">
-          {{ t('showMoreGroups', { n: fmt(filteredGroups.length - glimit) }) }}
-        </button>
+        <Pagination
+          :page="page"
+          :total="filteredGroups.length"
+          :per-page="perPage"
+          @update:page="goToPage"
+        />
       </template>
     </div>
 
@@ -464,6 +528,13 @@ function cycleSort() {
       :siblings="siblings"
       @close="selected = null"
       @select="selectRelated"
+    />
+
+    <Lightbox
+      v-if="lightbox"
+      :src="lightbox.src"
+      :name="lightbox.name"
+      @close="lightbox = null"
     />
   </div>
 </template>
@@ -535,9 +606,7 @@ function cycleSort() {
   flex-shrink: 0;
   border-radius: var(--radius-sm);
 }
-.row-thumb.photo { width: 40px; object-fit: cover; background: var(--code-bg); }
 .density-dense .row-thumb { width: 18px; height: 18px; }
-.density-dense .row-thumb.photo { width: 30px; }
 .row-thumb + .row-name { flex: 1; }
 
 /* gallery */
@@ -546,7 +615,6 @@ function cycleSort() {
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: var(--sp-2);
 }
-.gallery:has(.tile-img.photo) { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 .tile {
   background: var(--surface-primary);
   border: 1px solid var(--border-primary);
@@ -565,10 +633,38 @@ function cycleSort() {
   justify-content: center;
   padding: var(--sp-2);
 }
-.tile-img.photo { aspect-ratio: 16 / 9; padding: 0; background: var(--code-bg); }
+.tile-img { position: relative; }
 .tile-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
-.tile-img.photo img { width: 100%; height: 100%; object-fit: cover; }
-.tile.no-img .tile-img { display: none; }
+.zoom-btn {
+  position: absolute;
+  top: var(--sp-1);
+  right: var(--sp-1);
+  width: 22px;
+  height: 22px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: zoom-in;
+}
+.tile:hover .zoom-btn { display: flex; }
+.zoom-btn:hover { color: var(--accent-primary); border-color: var(--accent-primary); }
+.row-thumb { cursor: zoom-in; }
+/* placeholder shows only when the tile has no image (or the image 404s) */
+.no-image-ph { display: none; }
+.tile.no-img .no-image-ph {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+}
+.tile.no-img .tile-img img,
+.tile.no-img .zoom-btn { display: none; }
 .tile-foot {
   display: flex;
   align-items: center;
@@ -577,7 +673,6 @@ function cycleSort() {
   padding: var(--sp-1) var(--sp-2);
   border-top: 1px solid var(--border-muted);
 }
-.tile.no-img .tile-foot { border-top: none; }
 .tile-name {
   font-size: var(--fs-xs);
   overflow: hidden;

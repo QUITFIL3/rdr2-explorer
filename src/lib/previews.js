@@ -75,24 +75,34 @@ function lookupIcon(name) {
   return null
 }
 
-// Resolve a preview URL, or null when this entry has no image.
+// Resolve preview images for an entry, or null when it has none.
+// Returns { thumb, full }: `thumb` is what grids and rows load (a 320px
+// downscale for model screenshots, which are up to 2560x1440 originals),
+// `full` is what the lightbox opens.
 // `textureUrl` is the row's own url field (texture categories only).
-export function previewUrl(catId, name, textureUrl) {
-  if (textureUrl) return TEX_BASE + textureUrl
+export function preview(catId, name, textureUrl) {
+  if (textureUrl) {
+    const u = TEX_BASE + textureUrl
+    return { thumb: u, full: u } // texture art is already tiny
+  }
   if (MODEL_CATS.has(catId)) {
     const idx = modelIndex.value
     if (!idx) return null
     const n = String(name).toLowerCase()
     const file = idx[n]
     if (!file) return null
-    return CDN_BASE ? CDN_BASE + file : import.meta.env.BASE_URL + 'images/models/' + n + '.jpg'
+    if (CDN_BASE) {
+      const u = CDN_BASE + file
+      return { thumb: u, full: u } // no downscaled variant exists on the CDN
+    }
+    const base = import.meta.env.BASE_URL + 'images/models/'
+    return { thumb: base + 'thumbs/' + n + '.jpg', full: base + n + '.jpg' }
   }
   if (ICON_CATS.has(catId)) {
     const hit = lookupIcon(name)
-    return hit ? TEX_BASE + hit : null
+    if (!hit) return null
+    const u = TEX_BASE + hit
+    return { thumb: u, full: u }
   }
   return null
 }
-
-// Model screenshots are wide photos; textures and icons are small transparent art.
-export const isPhotoPreview = (catId, textureUrl) => !textureUrl && MODEL_CATS.has(catId)

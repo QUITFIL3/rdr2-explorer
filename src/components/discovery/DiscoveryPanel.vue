@@ -2,12 +2,13 @@
 import { computed, ref, watch } from 'vue'
 import { CATEGORY_META, REPO_URL } from '../../categories.js'
 import { joaat, toHex, toSigned, copyText } from '../../lib/joaat.js'
-import { ensurePreviews, previewUrl, isPhotoPreview } from '../../lib/previews.js'
+import { ensurePreviews, preview } from '../../lib/previews.js'
 import { isBookmarked, toggleBookmark, pushRecent } from '../../lib/storage.js'
 import { entryUrl } from '../../lib/router.js'
 import { t } from '../../i18n.js'
 import Icon from '../common/Icon.vue'
 import CodeBlock from '../common/CodeBlock.vue'
+import Lightbox from '../common/Lightbox.vue'
 import WorldMap from './WorldMap.vue'
 
 const props = defineProps({
@@ -51,10 +52,10 @@ const detailFields = computed(() =>
 ensurePreviews(props.cat.id)
 const imgFailed = ref(false)
 watch(name, () => (imgFailed.value = false))
-const imageUrl = computed(() =>
-  imgFailed.value ? null : previewUrl(props.cat.id, name.value, props.entry.url)
+const img = computed(() =>
+  imgFailed.value ? null : preview(props.cat.id, name.value, props.entry.url)
 )
-const photoStyle = computed(() => isPhotoPreview(props.cat.id, props.entry.url))
+const lightboxOpen = ref(false)
 
 const coords = computed(() => {
   const { x, y } = props.entry
@@ -104,11 +105,12 @@ function share() {
       </a>
     </div>
 
-    <div v-if="imageUrl" class="panel-section">
-      <div class="panel-img" :class="{ photo: photoStyle }">
-        <img :src="imageUrl" :alt="name" loading="lazy" @error="imgFailed = true" />
-      </div>
+    <div v-if="img" class="panel-section">
+      <button class="panel-img" :title="t('viewLarge')" @click="lightboxOpen = true">
+        <img :src="img.thumb" :alt="name" loading="lazy" decoding="async" @error="imgFailed = true" />
+      </button>
     </div>
+    <Lightbox v-if="lightboxOpen && img" :src="img.full" :name="name" @close="lightboxOpen = false" />
 
     <div v-if="coords" class="panel-section">
       <div class="panel-label">{{ t('location') }}</div>
@@ -186,6 +188,8 @@ function share() {
 .panel-section { margin-bottom: var(--sp-5); }
 
 .panel-img {
+  width: 100%;
+  background: none;
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -193,10 +197,10 @@ function share() {
   align-items: center;
   justify-content: center;
   padding: var(--sp-4);
+  cursor: zoom-in;
 }
-.panel-img.photo { padding: 0; background: var(--code-bg); }
-.panel-img img { max-width: 100%; max-height: 240px; object-fit: contain; }
-.panel-img.photo img { width: 100%; max-height: 260px; object-fit: cover; }
+.panel-img:hover { border-color: var(--text-muted); }
+.panel-img img { max-width: 100%; max-height: 260px; object-fit: contain; }
 
 .detail-grid {
   display: grid;

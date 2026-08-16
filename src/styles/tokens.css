@@ -6,21 +6,21 @@
    ============================================================ */
 
 :root {
-  /* ---------- color: dark (default) ---------- */
-  --bg-primary: #0d0c0b;
-  --bg-secondary: #121110;
-  --bg-tertiary: #171514;
+  /* ---------- color: dark (default) — true black, neutral ---------- */
+  --bg-primary: #000000;
+  --bg-secondary: #08080a;
+  --bg-tertiary: #0e0e11;
 
-  --surface-primary: #161413;
-  --surface-hover: #1e1b19;
-  --surface-active: #262220;
+  --surface-primary: #0b0b0d;
+  --surface-hover: #151518;
+  --surface-active: #1d1d21;
 
-  --border-primary: #2b2723;
-  --border-muted: #201d1a;
+  --border-primary: #232327;
+  --border-muted: #17171a;
 
-  --text-primary: #ece7df;
-  --text-secondary: #b3aa9d;
-  --text-muted: #7f776c;
+  --text-primary: #f2f2f4;
+  --text-secondary: #a8a8b0;
+  --text-muted: #75757e;
 
   --accent-primary: #d24a3a;      /* deep red — links, active, primary actions */
   --accent-primary-dim: #a53527;
@@ -31,14 +31,15 @@
   --danger: #e05252;
   --info: #6a9fd8;
 
-  --code-bg: #0a0908;
-  --scrollbar: #2c2823;
-  --scrollbar-hover: #423c34;
-  --backdrop: rgba(0, 0, 0, 0.6);
+  --code-bg: #08080a;
+  --scrollbar: #26262b;
+  --scrollbar-hover: #3a3a42;
+  --backdrop: rgba(0, 0, 0, 0.8);
 
   /* ---------- typography ---------- */
-  --font-ui: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-logo: Georgia, 'Times New Roman', serif; /* western flavor: logo + rare headings only */
+  --font-ui: 'Kanit', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-logo: 'Kanit', 'Segoe UI', system-ui, sans-serif;
+  /* identifiers, hashes and code stay monospace so characters stay distinguishable */
   --font-mono: 'Cascadia Code', Consolas, 'JetBrains Mono', 'SF Mono', monospace;
 
   --fs-xs: 10.5px;
