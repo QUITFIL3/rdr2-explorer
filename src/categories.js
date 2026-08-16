@@ -166,15 +166,31 @@ ${e.type === 'looped'
     snippet: (e) => `SetTimecycleModifier("${e.name}")
 -- clear: ClearTimecycleModifier()`,
   },
+  text_colors: {
+    titleTh: 'สีข้อความ (Text Colors)',
+    group: 'Graphics', icon: 'droplet',
+    desc: 'COLOR_* hashnames usable in on-screen text, with the short ~code~ form where one exists.',
+    descTh: 'ชื่อสี COLOR_* ที่ใช้กับข้อความบนหน้าจอ พร้อมรูปแบบย่อ ~code~ ถ้ามี',
+    snippet: (e) => `-- colour a run of text (short code works the same way: "~e~red")
+local text = "normal ~${e.shortcode ? e.shortcode.replace(/~/g, '') : e.name}~coloured~COLOR_WHITE~ normal"
+Citizen.InvokeNative(0xD79334A4BB99BAD1,
+  Citizen.InvokeNative(0xFA925AC00EB830B9, 10, "LITERAL_STRING", text, Citizen.ResultAsLong()), 0.1, 0.4)`,
+  },
   markers: {
     titleTh: 'มาร์กเกอร์',
     group: 'Graphics', icon: 'map-pin',
     desc: 'Marker prop hashes drawable with DRAW_MARKER.',
     descTh: 'hash ของ marker ที่วาดได้ด้วย DRAW_MARKER',
     snippet: (e) => `-- DRAW_MARKER (call every frame)
+local scale = 1.0
+local r, g, b, a = 250, 60, 40, 200  -- colour + opacity (0-255)
 local c = GetEntityCoords(PlayerPedId())
 Citizen.InvokeNative(0x2A32FAA57B937173, ${e.hash}, c.x, c.y + 2.0, c.z + 1.0,
-  0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 250, 250, 100, 250, 0, 0, 2, 0, 0, 0, 0)`,
+  0, 0, 0,          -- direction
+  0, 0, 0,          -- rotation
+  scale, scale, scale,
+  r, g, b, a,
+  false, false, 2, false, nil, nil, false)`,
   },
   explosion_vfx: {
     titleTh: 'เอฟเฟกต์ระเบิด',

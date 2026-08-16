@@ -49,11 +49,11 @@ const detailFields = computed(() =>
   Object.entries(props.entry).filter(([k]) => k !== 'name' && k !== 'url')
 )
 
-ensurePreviews(props.cat.id)
+ensurePreviews(props.cat)
 const imgFailed = ref(false)
 watch(name, () => (imgFailed.value = false))
 const img = computed(() =>
-  imgFailed.value ? null : preview(props.cat.id, name.value, props.entry.url)
+  imgFailed.value ? null : preview(name.value, props.entry.url)
 )
 const lightboxOpen = ref(false)
 

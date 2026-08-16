@@ -1,11 +1,12 @@
 <script setup>
-import { ref, shallowRef, computed, reactive, watch, onMounted } from 'vue'
+import { ref, shallowRef, computed, reactive, watch, onMounted, onUnmounted } from 'vue'
 import { CATEGORY_META } from '../../categories.js'
 import { copyText } from '../../lib/joaat.js'
 import { t, catDesc, catTitle } from '../../i18n.js'
 import { density } from '../../lib/storage.js'
 import { parseHash, replaceQuery } from '../../lib/router.js'
 import { categoryHasPreviews, ensurePreviews, preview } from '../../lib/previews.js'
+import { loadCategory, forgetCategory } from '../../lib/dataStore.js'
 import Icon from '../common/Icon.vue'
 import Lightbox from '../common/Lightbox.vue'
 import Pagination from '../common/Pagination.vue'
@@ -32,8 +33,15 @@ const dq = ref('')
 let debounce
 watch(q, (v) => {
   clearTimeout(debounce)
-  debounce = setTimeout(() => { dq.value = v; page.value = 1 }, 200)
+  debounce = setTimeout(() => {
+    // no-op when the route already applied this query, so restoring a URL with
+    // ?page=5 isn't clobbered back to page 1
+    if (dq.value === v) return
+    dq.value = v
+    page.value = 1
+  }, 200)
 })
+onUnmounted(() => clearTimeout(debounce))
 
 const facetSel = reactive({})
 const facetValues = shallowRef({})
@@ -53,7 +61,7 @@ const fieldIdx = computed(() => {
 
 const hasCoords = (props.cat.fields || []).includes('x') && (props.cat.fields || []).includes('y')
 const hasGallery = categoryHasPreviews(props.cat)
-ensurePreviews(props.cat.id)
+ensurePreviews(props.cat)
 // every category with previews opens as a tile grid; coordinate categories open on the map
 const defaultView = hasCoords ? 'map' : hasGallery ? 'gallery' : 'list'
 const viewMode = ref(defaultView)
@@ -68,6 +76,11 @@ function applyRoute() {
   }
   const view = query.get('view')
   if (view && ['list', 'map', 'gallery'].includes(view)) viewMode.value = view
+  const sort = query.get('sort')
+  sortDir.value = sort === 'asc' || sort === 'desc' ? sort : ''
+  imagesFirst.value = query.get('noimg') !== '1'
+  const p = Number(query.get('page'))
+  page.value = Number.isInteger(p) && p > 0 ? p : 1
   pendingSel = query.get('sel')
     ? { name: query.get('sel'), group: query.get('selg') || null }
     : null
@@ -84,13 +97,20 @@ function syncUrl() {
     if (facetSel[f]) p.set('f_' + f, facetSel[f])
   }
   if (viewMode.value !== defaultView) p.set('view', viewMode.value)
+  if (sortDir.value) p.set('sort', sortDir.value)
+  if (!imagesFirst.value) p.set('noimg', '1')
+  if (page.value > 1) p.set('page', String(page.value))
   if (selected.value) {
     p.set('sel', String(selected.value.name ?? selected.value[props.cat.fields?.[0]]))
     if (selected.value.group) p.set('selg', selected.value.group)
   }
   replaceQuery(p)
 }
-watch([dq, facetSel, viewMode, selected], syncUrl)
+watch([dq, facetSel, viewMode, selected, sortDir, imagesFirst, page], syncUrl)
+// narrowing or reordering the result set invalidates the current page
+watch([facetSel, sortDir, imagesFirst], () => {
+  if (!syncing) page.value = 1
+})
 watch(() => props.routeTick, () => { syncing = true; applyRoute(); syncing = false; syncUrl() })
 
 function applyPendingSelection() {
@@ -113,9 +133,8 @@ async function load() {
   loading.value = true
   error.value = ''
   try {
-    const res = await fetch(import.meta.env.BASE_URL + `data/${props.cat.id}.json`)
-    if (!res.ok) throw new Error('HTTP ' + res.status)
-    const json = await res.json()
+    forgetCategory(props.cat.id) // drop any cached failure before retrying
+    const json = await loadCategory(props.cat.id)
     if (json.kind === 'rows') {
       rowsLower = json.rows.map((r) => r.join(' ').toLowerCase())
       const fv = {}
@@ -135,7 +154,9 @@ async function load() {
     data.value = json
     applyPendingSelection()
   } catch (e) {
-    error.value = t('failedData') + e.message
+    // users get a plain sentence; the technical cause stays in the console
+    console.error('[CategoryView] load failed', props.cat.id, e)
+    error.value = t('failedData')
   } finally {
     loading.value = false
   }
@@ -167,9 +188,14 @@ const filteredRows = computed(() => {
     const dir = sortDir.value === 'asc' ? 1 : -1
     out.sort((a, b) => dir * String(a[0]).localeCompare(String(b[0])))
   }
-  // entries with a preview first, so the grid opens on actual images
+  // Entries with a preview first, so the grid opens on actual images.
+  // Partitioning is O(n) and stable; sorting here would call the (string-heavy)
+  // preview lookup O(n log n) times — ~280k calls on the 20k-row objects list.
   if (imagesFirst.value && hasGallery && !props.cat.image) {
-    out.sort((a, b) => (rowPreview(b) ? 1 : 0) - (rowPreview(a) ? 1 : 0))
+    const withImg = []
+    const withoutImg = []
+    for (const row of out) (rowPreview(row) ? withImg : withoutImg).push(row)
+    return withImg.concat(withoutImg)
   }
   return out
 })
@@ -264,10 +290,13 @@ const mapPoints = computed(() => {
 
 // null src -> the tile/row renders without an image rather than a broken one
 const rowPreview = (row) =>
-  preview(props.cat.id, String(row[0]), props.cat.image ? row[fieldIdx.value.url] : null)
+  preview(String(row[0]), props.cat.image ? row[fieldIdx.value.url] : null)
 
 const galleryTiles = computed(() =>
-  shownRows.value.map((row) => ({ row, name: String(row[0]), img: rowPreview(row) }))
+  shownRows.value.map((row) => {
+    const img = rowPreview(row)
+    return { row, name: String(row[0]), img, src: displaySrc(img) }
+  })
 )
 
 // full-size image opened from a tile / row thumbnail
@@ -276,16 +305,22 @@ function openLightbox(name, img) {
   if (img) lightbox.value = { name, src: img.full }
 }
 
-// thumbnails may come from a resizing proxy; fall back to the original once,
-// then give up and show the placeholder
-function onThumbError(e, img) {
-  const el = e.target
-  if (img && el.src !== img.full) {
-    el.src = img.full
-    return
-  }
-  el.closest('.tile')?.classList.add('no-img')
-  el.remove()
+// Image failures are tracked in state rather than by mutating the DOM, so the
+// renderer stays the only thing touching these nodes across re-renders.
+// A thumbnail that fails falls back to the original once; if that fails too the
+// entry renders as "no image".
+const thumbFailed = reactive(new Set())
+const imageFailed = reactive(new Set())
+
+function displaySrc(img) {
+  if (!img) return null
+  if (imageFailed.has(img.full)) return null
+  return thumbFailed.has(img.thumb) ? img.full : img.thumb
+}
+function onImgError(img) {
+  if (!img) return
+  if (!thumbFailed.has(img.thumb) && img.thumb !== img.full) thumbFailed.add(img.thumb)
+  else imageFailed.add(img.full)
 }
 
 const fmt = (n) => n.toLocaleString('en-US')
@@ -313,7 +348,8 @@ function cycleSort() {
         <input
           v-model="q"
           class="search-input"
-          type="text"
+          type="search"
+          :aria-label="t('searchPlaceholder', { n: fmt(cat.count) })"
           :placeholder="t('searchPlaceholder', { n: fmt(cat.count) })"
           spellcheck="false"
         />
@@ -419,24 +455,28 @@ function cycleSort() {
             v-for="tile in galleryTiles"
             :key="tile.name + (tile.row[3] || '')"
             class="tile"
-            :class="{ selected: selected && String(selected.name ?? selected[cat.fields[0]]) === tile.name, 'no-img': !tile.img }"
+            :class="{ selected: selected && String(selected.name ?? selected[cat.fields[0]]) === tile.name, 'no-img': !tile.src }"
             :title="tile.name"
+            role="button"
+            tabindex="0"
             @click="selectRow(tile.row)"
+            @keydown.enter.prevent="selectRow(tile.row)"
+            @keydown.space.prevent="selectRow(tile.row)"
           >
             <div class="tile-img">
-              <template v-if="tile.img">
+              <template v-if="tile.src">
                 <img
-                  :src="tile.img.thumb"
+                  :src="tile.src"
                   :alt="tile.name"
                   loading="lazy"
                   decoding="async"
-                  @error="onThumbError($event, tile.img)"
+                  @error="onImgError(tile.img)"
                 />
                 <button class="zoom-btn" :title="t('viewLarge')" @click.stop="openLightbox(tile.name, tile.img)">
                   <Icon name="maximize" :size="12" />
                 </button>
               </template>
-              <div class="no-image-ph">
+              <div v-else class="no-image-ph">
                 <Icon name="image" :size="20" />
                 <span>{{ t('noImage') }}</span>
               </div>
@@ -463,18 +503,22 @@ function cycleSort() {
             :key="i"
             class="row"
             :class="{ selected: selected && selected[cat.fields[0]] === row[0] }"
+            role="button"
+            tabindex="0"
             @click="selectRow(row)"
+            @keydown.enter.prevent="selectRow(row)"
+            @keydown.space.prevent="selectRow(row)"
           >
             <img
-              v-if="hasGallery && rowPreview(row)"
+              v-if="hasGallery && displaySrc(rowPreview(row))"
               class="row-thumb"
-              :src="rowPreview(row).thumb"
+              :src="displaySrc(rowPreview(row))"
               :alt="String(row[0])"
               loading="lazy"
               decoding="async"
               :title="t('viewLarge')"
               @click.stop="openLightbox(String(row[0]), rowPreview(row))"
-              @error="$event.target.remove()"
+              @error="onImgError(rowPreview(row))"
             />
             <span class="row-name">{{ row[0] }}</span>
             <span class="row-meta">
@@ -502,7 +546,15 @@ function cycleSort() {
       <template v-else>
         <div class="group-list">
           <div v-for="g in shownGroups" :key="g.name" class="group">
-            <div class="group-head" @click="toggle(g)">
+            <div
+              class="group-head"
+              role="button"
+              tabindex="0"
+              :aria-expanded="isExpanded(g)"
+              @click="toggle(g)"
+              @keydown.enter.prevent="toggle(g)"
+              @keydown.space.prevent="toggle(g)"
+            >
               <Icon name="chevron-right" :size="12" class="caret" :class="{ open: isExpanded(g) }" />
               <span class="row-name">{{ g.name }}</span>
               <span class="row-meta">
@@ -516,7 +568,11 @@ function cycleSort() {
                 :key="m"
                 class="row member"
                 :class="{ selected: selected && selected.name === m && selected.group === g.name }"
+                role="button"
+                tabindex="0"
                 @click="selectMember(g.name, m)"
+                @keydown.enter.prevent="selectMember(g.name, m)"
+                @keydown.space.prevent="selectMember(g.name, m)"
               >
                 <span class="row-name">{{ m }}</span>
                 <button class="chip small accent" :title="t('copyName')" @click.stop="copyText(m)">{{ t('copy') }}</button>
@@ -665,9 +721,7 @@ function cycleSort() {
 .tile:hover .zoom-btn { display: flex; }
 .zoom-btn:hover { color: var(--accent-primary); border-color: var(--accent-primary); }
 .row-thumb { cursor: zoom-in; }
-/* placeholder shows only when the tile has no image (or the image 404s) */
-.no-image-ph { display: none; }
-.tile.no-img .no-image-ph {
+.no-image-ph {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -675,8 +729,6 @@ function cycleSort() {
   color: var(--text-muted);
   font-size: var(--fs-xs);
 }
-.tile.no-img .tile-img img,
-.tile.no-img .zoom-btn { display: none; }
 .tile-foot {
   display: flex;
   align-items: center;

@@ -12,9 +12,7 @@
 // Indexes load once, lazily, and are shared by the list, gallery and panel.
 import { shallowRef } from 'vue'
 import { TEX_BASE } from '../categories.js'
-
-// categories whose entries are primarily model names (tiles render as photos)
-export const MODEL_CATS = new Set(['peds', 'vehicles', 'objects', 'doors', 'markers', 'imaps'])
+import { loadCategory } from './dataStore.js'
 
 // Deployed builds hotlink the model screenshots (the local set is multi-GB).
 // Grids must not pull the 165KB-400KB originals, so thumbs go through an
@@ -55,11 +53,7 @@ const ICON_SOURCES = [
 
 function loadIconIndex() {
   iconPromise ||= Promise.all(
-    ICON_SOURCES.map((id) =>
-      fetch(import.meta.env.BASE_URL + `data/${id}.json`)
-        .then((r) => (r.ok ? r.json() : null))
-        .catch(() => null)
-    )
+    ICON_SOURCES.map((id) => loadCategory(id).catch(() => null))
   ).then((sets) => {
     const m = new Map()
     for (const j of sets) {
@@ -82,8 +76,14 @@ export function categoryHasPreviews(cat) {
   return !!cat.image || cat.kind === 'rows'
 }
 
-// Kick off the indexes this category needs. Safe to call repeatedly.
-export function ensurePreviews(catId) {
+/**
+ * Warm the lookup indexes a category needs. No-op for categories that can never
+ * show an image, so browsing Animations doesn't pull ~1MB of unused indexes.
+ * @param {{id: string, kind?: string, image?: boolean}} cat manifest entry
+ */
+export function ensurePreviews(cat) {
+  if (!cat || !categoryHasPreviews(cat)) return
+  if (cat.image) return // rows carry their own image url; no index needed
   loadModelIndex()
   loadIconIndex()
 }
@@ -110,7 +110,7 @@ function lookupIcon(name) {
 // downscale for model screenshots, which are up to 2560x1440 originals),
 // `full` is what the lightbox opens.
 // `textureUrl` is the row's own url field (texture categories only).
-export function preview(catId, name, textureUrl) {
+export function preview(name, textureUrl) {
   if (textureUrl) {
     const u = TEX_BASE + textureUrl
     return { thumb: u, full: u } // texture art is already tiny

@@ -77,13 +77,24 @@ let lx = 0
 let ly = 0
 let downTarget = null // pointer capture retargets pointerup to the wrap, so remember the real target
 
+let capturedId = null
+
 function onDown(e) {
   dragging = true
   moved = 0
   lx = e.clientX
   ly = e.clientY
   downTarget = e.target
+  capturedId = e.pointerId
   wrap.value.setPointerCapture(e.pointerId)
+}
+
+function releaseCapture() {
+  if (capturedId === null) return
+  try {
+    wrap.value?.releasePointerCapture(capturedId)
+  } catch { /* already released by the browser */ }
+  capturedId = null
 }
 
 const tip = ref({ show: false, x: 0, y: 0, text: '' })
@@ -117,6 +128,7 @@ function onMove(e) {
 
 function onUp() {
   dragging = false
+  releaseCapture()
   if (moved < 6 && downTarget) {
     const i = downTarget.dataset ? downTarget.dataset.i : undefined
     if (i !== undefined) emit('select', props.points[+i])
@@ -126,6 +138,7 @@ function onUp() {
 
 function onLeave() {
   dragging = false
+  releaseCapture()
   tip.value.show = false
 }
 </script>

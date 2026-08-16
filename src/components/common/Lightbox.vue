@@ -13,13 +13,21 @@ const emit = defineEmits(['close'])
 function onKey(e) {
   if (e.key === 'Escape') emit('close')
 }
-onMounted(() => window.addEventListener('keydown', onKey))
-onUnmounted(() => window.removeEventListener('keydown', onKey))
+// return focus where it was so keyboard users don't land at the top of the page
+let opener = null
+onMounted(() => {
+  opener = document.activeElement
+  window.addEventListener('keydown', onKey)
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKey)
+  if (opener instanceof HTMLElement) opener.focus()
+})
 </script>
 
 <template>
   <Teleport to="body">
-    <div class="lightbox" @click.self="emit('close')">
+    <div class="lightbox" role="dialog" aria-modal="true" :aria-label="name" @click.self="emit('close')">
       <div class="lb-bar">
         <span class="lb-name mono">{{ name }}</span>
         <button class="icon-btn" :title="t('copyName')" @click="copyText(name)">

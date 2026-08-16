@@ -116,11 +116,13 @@ function onKey(e) {
           </div>
         </div>
 
-        <div ref="listEl" class="pal-list">
+        <div ref="listEl" class="pal-list" role="listbox" :aria-label="t('globalSearch')">
           <div
             v-for="(item, i) in items"
             :key="item.type === 'cmd' ? 'cmd' + item.label : item.c + (item.g || '') + item.n + i"
             class="pal-item"
+            role="option"
+            :aria-selected="i === activeIdx"
             :class="{ active: i === activeIdx }"
             @pointermove="activeIdx = i"
             @click="execute(item)"

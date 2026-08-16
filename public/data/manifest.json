@@ -526,5 +526,18 @@
     "facets": [
       "dict"
     ]
+  },
+  {
+    "id": "text_colors",
+    "title": "Text Colors",
+    "src": "useful_info_from_rpfs/colours",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "shortcode",
+      "url"
+    ],
+    "count": 380,
+    "image": true
   }
 ]

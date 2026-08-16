@@ -72,6 +72,7 @@ const messages = {
     'facet.slot': 'slot',
     'facet.type': 'type',
     'facet.dict': 'dict',
+    'facet.shortcode': 'short code',
     /* redesign */
     globalSearch: 'Search models, hashes, animations…',
     searchBig: 'Search {n} discoveries…',
@@ -188,6 +189,7 @@ const messages = {
     'facet.slot': 'ช่อง',
     'facet.type': 'ประเภท',
     'facet.dict': 'dict',
+    'facet.shortcode': 'short code',
     /* redesign */
     globalSearch: 'ค้นหาโมเดล, hash, แอนิเมชัน…',
     searchBig: 'ค้นหา {n} รายการ…',

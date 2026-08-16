@@ -24,8 +24,6 @@ onMounted(async () => {
 
 const fmt = (n) => n.toLocaleString('en-US')
 
-const catById = computed(() => Object.fromEntries(props.manifest.map((c) => [c.id, c])))
-
 const hashInput = ref('')
 const hashResult = computed(() => {
   const s = hashInput.value.trim()

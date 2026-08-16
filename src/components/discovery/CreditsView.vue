@@ -1,7 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { t } from '../../i18n.js'
-import { REPO_URL } from '../../categories.js'
 import Icon from '../common/Icon.vue'
 
 const props = defineProps({ manifest: { type: Array, required: true } })

@@ -255,6 +255,31 @@ function parseDict(text) {
   addRows('explosion_vfx', 'Explosion VFX Tags', 'graphics/explosions/explosion_vfxTags.lua', ['name', 'hash'], rows)
 }
 
+// ---------------------------------------------------------------- text colours
+// README lists short codes ("~e~" -> COLOR_ENEMY) and a table pairing groups of
+// COLOR_* hashnames with a screenshot showing what each group looks like.
+{
+  const md = read('useful_info_from_rpfs/colours/README.md')
+
+  const shortByName = new Map()
+  for (const m of md.matchAll(/^(\S+)\s+-\s+(COLOR_[A-Z0-9_]+)\s*$/gm)) {
+    shortByName.set(m[2], m[1])
+  }
+
+  const sampleByName = new Map()
+  for (const m of md.matchAll(/^((?:COLOR_[A-Z0-9_]+)(?:<br>COLOR_[A-Z0-9_]+)*)\s*\|\s*!\[[^\]]*\]\(https:\/\/femga\.com:8080\/images\/samples\/([^)]+)\)/gm)) {
+    for (const name of m[1].split('<br>')) sampleByName.set(name.trim(), m[2])
+  }
+
+  const names = [...new Set([...md.matchAll(/COLOR_[A-Z0-9_]+/g)].map((m) => m[0]))].sort()
+  const rows = names.map((n) => [
+    n,
+    shortByName.get(n) ? '~' + shortByName.get(n) + '~' : '',
+    sampleByName.get(n) || '',
+  ])
+  addRows('text_colors', 'Text Colors', 'useful_info_from_rpfs/colours', ['name', 'shortcode', 'url'], rows, { image: true })
+}
+
 // ---------------------------------------------------------------- weather
 {
   const rows = []

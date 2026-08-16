@@ -1,7 +1,7 @@
 // Downloads all texture sample images referenced by public/data/tex_*.json
 // from femga.com:8080 into public/images/samples/ so the app runs fully local.
 // Usage: node scripts/download-images.mjs   (safe to re-run; skips existing files)
-import { readFileSync, readdirSync, mkdirSync, existsSync, writeFileSync } from 'node:fs'
+import { readFileSync, mkdirSync, existsSync, writeFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -10,12 +10,16 @@ const DATA = join(ROOT, 'public', 'data')
 const OUT = join(ROOT, 'public', 'images', 'samples')
 const BASE = 'https://femga.com:8080/images/samples/'
 
+// driven by the manifest (image: true) rather than a filename prefix, so a new
+// image-bearing category is picked up without touching this script
+const manifest = JSON.parse(readFileSync(join(DATA, 'manifest.json'), 'utf8'))
 const urls = new Set()
-for (const f of readdirSync(DATA)) {
-  if (!f.startsWith('tex_')) continue
-  const j = JSON.parse(readFileSync(join(DATA, f), 'utf8'))
+for (const cat of manifest) {
+  if (!cat.image) continue
+  const j = JSON.parse(readFileSync(join(DATA, cat.id + '.json'), 'utf8'))
   const idx = j.fields.indexOf('url')
-  for (const r of j.rows) urls.add(r[idx])
+  if (idx < 0) continue
+  for (const r of j.rows) if (r[idx]) urls.add(r[idx])
 }
 const list = [...urls]
 console.log(`${list.length} images referenced`)

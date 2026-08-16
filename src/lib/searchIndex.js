@@ -3,6 +3,7 @@
 // array searched linearly with ranked matching (exact > prefix > substring).
 // Hash strings (0x...) are indexed for rows-categories that carry a hash field.
 import { ref } from 'vue'
+import { loadCategory } from './dataStore.js'
 
 export const indexReady = ref(false)
 export const indexProgress = ref(0) // 0..1
@@ -26,8 +27,7 @@ async function build(manifest) {
   let loaded = 0
   for (const c of cats) {
     try {
-      const res = await fetch(import.meta.env.BASE_URL + `data/${c.id}.json`)
-      const j = await res.json()
+      const j = await loadCategory(c.id)
       const startLen = entries.length
       const yieldIfDue = async () => {
         if ((entries.length - startLen) % CHUNK !== 0) return
