@@ -7,6 +7,7 @@ import { isBookmarked, toggleBookmark, pushRecent, devMode } from '../../lib/sto
 import { entryUrl } from '../../lib/router.js'
 import { t } from '../../i18n.js'
 import Icon from '../common/Icon.vue'
+import KeyCaps from '../common/KeyCaps.vue'
 import CodeBlock from '../common/CodeBlock.vue'
 import Lightbox from '../common/Lightbox.vue'
 import WorldMap from './WorldMap.vue'
@@ -140,7 +141,13 @@ function share() {
       <div class="detail-grid">
         <template v-for="[k, v] in detailFields" :key="k">
           <span class="detail-key">{{ k.replace('_', ' ') }}</span>
-          <button class="detail-val mono" :title="t('copy') + ' ' + k" @click="copyText(String(v))">{{ v }}</button>
+          <button
+            v-if="(k === 'keyboard' || k === 'xbox') && v"
+            class="detail-val"
+            :title="t('copy') + ' ' + k"
+            @click="copyText(String(v))"
+          ><KeyCaps :keys="String(v)" /></button>
+          <button v-else class="detail-val mono" :title="t('copy') + ' ' + k" @click="copyText(String(v))">{{ v }}</button>
         </template>
         <template v-if="coordText">
           <span class="detail-key">x, y, z</span>

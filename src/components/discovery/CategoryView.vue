@@ -8,6 +8,7 @@ import { parseHash, replaceQuery } from '../../lib/router.js'
 import { categoryHasPreviews, ensurePreviews, preview } from '../../lib/previews.js'
 import { loadCategory, forgetCategory } from '../../lib/dataStore.js'
 import Icon from '../common/Icon.vue'
+import KeyCaps from '../common/KeyCaps.vue'
 import Lightbox from '../common/Lightbox.vue'
 import Pagination from '../common/Pagination.vue'
 import DiscoveryPanel from './DiscoveryPanel.vue'
@@ -523,8 +524,15 @@ function cycleSort() {
             <span class="row-name">{{ row[0] }}</span>
             <span class="row-meta">
               <template v-for="(f, j) in cat.fields" :key="f">
+                <!-- keyboard / controller mappings render as visual key caps -->
                 <button
-                  v-if="j > 0 && row[j] !== '' && row[j] !== undefined && f !== 'url'"
+                  v-if="(f === 'keyboard' || f === 'xbox') && row[j]"
+                  class="chip small keycap-chip"
+                  :title="t('copy') + ' ' + f"
+                  @click.stop="copyText(String(row[j]))"
+                ><KeyCaps :keys="String(row[j])" /></button>
+                <button
+                  v-else-if="j > 0 && row[j] !== '' && row[j] !== undefined && f !== 'url'"
                   class="chip small"
                   :title="t('copy') + ' ' + f"
                   @click.stop="copyText(String(row[j]))"
@@ -647,6 +655,9 @@ function cycleSort() {
 .view-toggle { display: flex; gap: var(--sp-1); }
 
 .filter-chips { margin-bottom: var(--sp-3); }
+
+/* chip that wraps key caps (controls category) */
+.keycap-chip { border: none; padding: 2px 0; background: none; }
 
 /* groups */
 .group { border-bottom: 1px solid var(--border-muted); }
