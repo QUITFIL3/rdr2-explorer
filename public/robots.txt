@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://quitfil3.github.io/rdr3-explorer/sitemap.xml
+Sitemap: https://quitfil3.github.io/rdr2-explorer/sitemap.xml

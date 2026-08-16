@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url'
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)))
 const DIST = join(ROOT, 'dist')
 // DEPLOY_REMOTE lets CI push with a token URL; local runs use the plain remote
-const REMOTE = process.env.DEPLOY_REMOTE || 'https://github.com/QUITFIL3/rdr3-explorer.git'
+const REMOTE = process.env.DEPLOY_REMOTE || 'https://github.com/QUITFIL3/rdr2-explorer.git'
 const run = (cmd, opts = {}) => execSync(cmd, { stdio: 'inherit', cwd: ROOT, ...opts })
 
 process.env.DEPLOY_PAGES = '1'
@@ -60,4 +60,4 @@ g('add -A')
 g('commit -q -m "deploy to GitHub Pages" -m "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"')
 g(`push -f ${REMOTE} gh-pages`)
 rmSync(join(DIST, '.git'), { recursive: true, force: true })
-console.log('deployed: https://quitfil3.github.io/rdr3-explorer/')
+console.log('deployed: https://quitfil3.github.io/rdr2-explorer/')

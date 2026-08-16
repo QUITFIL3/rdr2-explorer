@@ -36,7 +36,7 @@ const hashResult = computed(() => {
 <template>
   <div class="home">
     <section class="hero">
-      <h1 class="hero-title">RDR2 Discoveries</h1>
+      <h1 class="hero-title">RDR2 EXPLORER</h1>
       <p class="hero-tagline">
         <template v-for="(line, i) in t('heroTagline').split('\n')" :key="i">
           {{ line }}<br v-if="i === 0" />

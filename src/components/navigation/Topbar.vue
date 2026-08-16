@@ -17,7 +17,7 @@ const markUrl = import.meta.env.BASE_URL + 'brand/hexa-mark-clear.png'
     </button>
     <a class="logo" href="#/">
       <img class="logo-mark" :src="markUrl" alt="Hexa Development" width="26" height="26" />
-      <span class="logo-text">RDR2 Discoveries</span>
+      <span class="logo-text">RDR2 EXPLORER</span>
     </a>
 
     <button class="global-search" @click="$emit('open-palette')">

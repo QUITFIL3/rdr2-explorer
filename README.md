@@ -1,4 +1,4 @@
-# RDR2 Discoveries — Developer Knowledge Base
+# RDR2 EXPLORER — Developer Knowledge Base
 
 ฐานข้อมูลสำหรับนักพัฒนา **RedM / RDR2** — ค้นหาข้อมูลเกมกว่า 411,000 รายการใน 39 หมวด
 (peds, weapons, animations, audio, ptfx, world ฯลฯ) จาก
@@ -92,9 +92,9 @@ scripts/
 **[Hexa Development](https://github.com/hexa-development)** — ทีมพัฒนาเซิร์ฟเวอร์และเครื่องมือสำหรับ RedM
 ดูแลคลังข้อมูลนี้เป็นแหล่งข้อมูลฟรีสำหรับชุมชนนักพัฒนา RDR2 / RedM
 
-- repo หลัก: [QUITFIL3/rdr3-explorer](https://github.com/QUITFIL3/rdr3-explorer)
-- fork ขององค์กร: [hexa-development/rdr3-explorer](https://github.com/hexa-development/rdr3-explorer)
-- เว็บไซต์: https://quitfil3.github.io/rdr3-explorer/
+- repo หลัก: [QUITFIL3/rdr2-explorer](https://github.com/QUITFIL3/rdr2-explorer)
+- fork ขององค์กร: [hexa-development/rdr2-explorer](https://github.com/hexa-development/rdr2-explorer)
+- เว็บไซต์: https://quitfil3.github.io/rdr2-explorer/
 
 ### แหล่งข้อมูล
 

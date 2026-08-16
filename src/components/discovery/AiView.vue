@@ -7,7 +7,7 @@ import CodeBlock from '../common/CodeBlock.vue'
 defineProps({ manifest: { type: Array, required: true } })
 
 // canonical deployed URL (matches index.html <link rel="canonical">)
-const SITE = 'https://quitfil3.github.io/rdr3-explorer/'
+const SITE = 'https://quitfil3.github.io/rdr2-explorer/'
 
 const ENDPOINTS = [
   { label: 'manifest', url: SITE + 'data/manifest.json' },
@@ -35,7 +35,14 @@ const FETCH_EXAMPLE = `-- any HTTP client works; no auth, CORS is open. JS examp
 -- const manifest = await (await fetch('${SITE}data/manifest.json')).json()
 -- const weapons  = await (await fetch('${SITE}data/weapons.json')).json()`
 
-const AI_PROMPT = `You can query the RDR2 Discoveries knowledge base (Red Dead Redemption 2 /
+const MCP_EXAMPLE = `# MCP server (Claude Code / any MCP client) — search all datasets,
+# reverse hash lookup, entry details, joaat calculator:
+git clone https://github.com/QUITFIL3/rdr2-explorer.git
+claude mcp add rdr2-explorer -- node rdr2-explorer/scripts/mcp-server.mjs
+# tools: list_categories · search · get_entry · hash_name
+# (inside this repo Claude Code picks it up automatically via .mcp.json)`
+
+const AI_PROMPT = `You can query the RDR2 EXPLORER knowledge base (Red Dead Redemption 2 /
 RedM game data) as static JSON — no auth needed:
 
 1. GET ${SITE}data/manifest.json
@@ -88,6 +95,12 @@ Full docs: ${SITE}llms.txt`
     <section class="ai-section">
       <div class="panel-label">{{ t('aiFetch') }}</div>
       <CodeBlock :code="FETCH_EXAMPLE" lang="lua" />
+    </section>
+
+    <section class="ai-section">
+      <div class="panel-label">{{ t('aiMcp') }}</div>
+      <p class="ai-hint">{{ t('aiMcpHint') }}</p>
+      <CodeBlock :code="MCP_EXAMPLE" lang="text" />
     </section>
 
     <section class="ai-section">

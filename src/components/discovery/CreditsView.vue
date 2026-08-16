@@ -72,8 +72,8 @@ const logoUrl = import.meta.env.BASE_URL + 'brand/hexa-logo-clear.png'
           <a class="chip small" href="https://github.com/hexa-development" target="_blank" rel="noopener">
             <Icon name="github" :size="11" /> hexa-development
           </a>
-          <a class="chip small" href="https://github.com/QUITFIL3/rdr3-explorer" target="_blank" rel="noopener">
-            <Icon name="github" :size="11" /> QUITFIL3/rdr3-explorer
+          <a class="chip small" href="https://github.com/QUITFIL3/rdr2-explorer" target="_blank" rel="noopener">
+            <Icon name="github" :size="11" /> QUITFIL3/rdr2-explorer
           </a>
         </div>
       </div>
