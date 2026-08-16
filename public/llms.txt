@@ -1,4 +1,4 @@
-# RDR3 Discoveries
+# RDR2 Discoveries
 
 > Developer knowledge base for Red Dead Redemption 2 / RedM game data: 411,000+
 > entries — ped/vehicle/object models, weapons, animations, scenarios, audio,

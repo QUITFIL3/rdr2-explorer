@@ -311,6 +311,35 @@ function parseDict(text) {
   addRows('imaps', 'IMAPs (map parts)', 'imaps/imaps_with_coords_and_heading.lua', ['name', 'hash', 'x', 'y', 'z'], rows)
 }
 
+// ---------------------------------------------------------------- controls
+// Controls/README.md: markdown tables "Hash | HashName | QWERTY | Xbox | Context",
+// repeated per context section — dedupe on the input name.
+{
+  const clean = (s) =>
+    s.replace(/<br>/g, ', ').replace(/&#8209;/g, '-').replace(/\s+/g, ' ').replace(/(, )+$/, '').trim()
+  const seen = new Set()
+  const rows = []
+  for (const line of read('Controls/README.md').split('\n')) {
+    const m = line.match(/^(0x[0-9A-Fa-f]+)\|(INPUT_\w+)\|([^|]*)\|([^|]*)\|([^|]*)$/)
+    if (!m || seen.has(m[2])) continue
+    seen.add(m[2])
+    rows.push([m[2], hex(m[1]), clean(m[3]), clean(m[4]), clean(m[5])])
+  }
+  addRows('controls', 'Controls', 'Controls', ['name', 'hash', 'keyboard', 'xbox', 'context'], rows)
+}
+
+// ---------------------------------------------------------------- zones
+// zones/README.md table: ZoneTypeId | ZoneTypeName | ZoneTypeNameHash | ZoneName | hex | dec
+{
+  const rows = []
+  for (const line of read('zones/README.md').split('\n')) {
+    const c = line.split('|').map((s) => s.trim())
+    if (c.length !== 6 || !/^\d+$/.test(c[0]) || !/^0x[0-9A-Fa-f]+$/.test(c[4])) continue
+    rows.push([c[3], hex(c[4]), c[1], +c[0]])
+  }
+  addRows('zones', 'Zones', 'zones', ['name', 'hash', 'type', 'type_id'], rows, { facets: ['type'] })
+}
+
 // ---------------------------------------------------------------- texture galleries
 // READMEs contain markdown tables: name | hash | ![name](https://femga.com:8080/images/samples/<path>) | ...
 // We store the path relative to the samples base; the frontend prepends it back.

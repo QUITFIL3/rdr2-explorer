@@ -240,6 +240,19 @@
     "count": 26
   },
   {
+    "id": "text_colors",
+    "title": "Text Colors",
+    "src": "useful_info_from_rpfs/colours",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "shortcode",
+      "url"
+    ],
+    "count": 380,
+    "image": true
+  },
+  {
     "id": "weather",
     "title": "Weather Types",
     "src": "weather/weather_types.lua",
@@ -292,6 +305,36 @@
       "z"
     ],
     "count": 8050
+  },
+  {
+    "id": "controls",
+    "title": "Controls",
+    "src": "Controls",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "keyboard",
+      "xbox",
+      "context"
+    ],
+    "count": 680
+  },
+  {
+    "id": "zones",
+    "title": "Zones",
+    "src": "zones",
+    "kind": "rows",
+    "fields": [
+      "name",
+      "hash",
+      "type",
+      "type_id"
+    ],
+    "count": 320,
+    "facets": [
+      "type"
+    ]
   },
   {
     "id": "tex_blips",
@@ -526,18 +569,5 @@
     "facets": [
       "dict"
     ]
-  },
-  {
-    "id": "text_colors",
-    "title": "Text Colors",
-    "src": "useful_info_from_rpfs/colours",
-    "kind": "rows",
-    "fields": [
-      "name",
-      "shortcode",
-      "url"
-    ],
-    "count": 380,
-    "image": true
   }
 ]

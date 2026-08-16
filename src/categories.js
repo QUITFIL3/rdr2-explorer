@@ -337,6 +337,28 @@ Citizen.InvokeNative(0x5E3BDDBCB83F3D84, PlayerPedId(), joaat("${e.name}"),
     snippet: (e) => `-- SET_WEATHER_TYPE (transition over 15s)
 Citizen.InvokeNative(0x59174F1AFE095B5A, joaat("${e.name}"), true, true, true, 15.0, false)`,
   },
+  zones: {
+    titleTh: 'โซนบนแผนที่ (Zones)',
+    group: 'World', icon: 'map-pin',
+    desc: 'Named map zones (states, towns, districts) with type and hash.',
+    descTh: 'โซนที่มีชื่อบนแผนที่ (รัฐ เมือง เขต) พร้อมประเภทและ hash',
+    snippet: (e) => `-- zone "${e.name}" (${e.type})
+-- GET_MAP_ZONE_AT_COORDS: find the ${String(e.type).toLowerCase()} at a position
+local zone = Citizen.InvokeNative(0x43AD8FC02B429D33, x, y, z, ${e.type_id} --[[${e.type}]])
+if zone == "${e.name}" then
+  print("player is in ${e.name}")
+end`,
+  },
+  controls: {
+    titleTh: 'ปุ่มควบคุม (Controls)',
+    group: 'Other', icon: 'sliders',
+    desc: 'Input controls with hash and default keyboard / controller mapping.',
+    descTh: 'ปุ่มควบคุมพร้อม hash และปุ่มคีย์บอร์ด / จอยที่ตั้งไว้เริ่มต้น',
+    snippet: (e) => `-- ${e.name}${e.keyboard ? '  (keyboard: ' + e.keyboard + ')' : ''}
+if IsControlJustPressed(0, ${e.hash}) then
+  print("pressed ${e.name}")
+end`,
+  },
   doors: {
     titleTh: 'ประตู (Door Hashes)',
     group: 'World', icon: 'door',

@@ -35,7 +35,7 @@ const FETCH_EXAMPLE = `-- any HTTP client works; no auth, CORS is open. JS examp
 -- const manifest = await (await fetch('${SITE}data/manifest.json')).json()
 -- const weapons  = await (await fetch('${SITE}data/weapons.json')).json()`
 
-const AI_PROMPT = `You can query the RDR3 Discoveries knowledge base (Red Dead Redemption 2 /
+const AI_PROMPT = `You can query the RDR2 Discoveries knowledge base (Red Dead Redemption 2 /
 RedM game data) as static JSON — no auth needed:
 
 1. GET ${SITE}data/manifest.json

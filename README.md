@@ -1,4 +1,4 @@
-# RDR3 Discoveries — Developer Knowledge Base
+# RDR2 Discoveries — Developer Knowledge Base
 
 ฐานข้อมูลสำหรับนักพัฒนา **RedM / RDR2** — ค้นหาข้อมูลเกมกว่า 411,000 รายการใน 39 หมวด
 (peds, weapons, animations, audio, ptfx, world ฯลฯ) จาก
